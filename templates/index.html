@@ -12,37 +12,14 @@
         </div>
         <div class="form-container">
             <h2> Upload Sitemaps</h2>
-            <form action="/check" method="post">
+            <form action="/check" method="post" enctype="multipart/form-data">
+            
                 <div>
-                    <label for="xml-url">Sitemap URL</label>
-                    <input class="text-input" type="text" name="xml-url" placeholder="https://example.com/sitemap.xml"
-                        title="This sitemap will be parsed for urls and checked for indexing" required>
+                    <label for="max-search-count">Proxy File</label>
+                    <input class="max-search-count text-input" type="file" min="1" max="100" value="2"
+                        name="proxy-file" placeholder="100" required
+                        title="A file with proxies for checking (seperate by newline)">
                 </div>
-                <div>
-                    <label for="max-search-count">Limit Checks</label>
-                    <input class="max-search-count text-input" type="number" min="1" max="100" value="2"
-                        name="max-search-count" placeholder="100" required
-                        title="The Maximum Limit You want us to Index per sitemap provided. An API Key has limited uses. Free(100)">
-                </div>
-
-                <details>
-                    <summary>Custom API</summary>
-                    <div class="detail-holder">
-                        <div>
-                            <label for="api-key">Google Search Engine API Key</label>
-                            <input class="text-input" type="text" name="api-key"
-                                title="Enter custom Google Search Engine API key"
-                                placeholder="AIzaSyAaujr.....x9lQVFrJz16IM">
-
-                        </div>
-                        <div>
-                            <label for="search-engine-id">Google Search Engine Id</label>
-                            <input class="text-input" type="text" name="search-engine-id"
-                                title="Enter Search Engine Id (cx)" placeholder="a167b3....424087">
-                        </div>
-                    </div>
-                    <p class="fineprint">*if empty will use the default</p>
-                </details>
 
                 <input class="submit-button" type="submit" value="Start"
                     title="Starts the Url hunt and checks for indexing based on set count.">
@@ -70,7 +47,7 @@
             if (text_as_json["progress"] != "")
                 document.getElementById("progress").innerHTML = text_as_json["progress"];
 
-        }, 2000)
+        }, 20000)
 
     </script>
 

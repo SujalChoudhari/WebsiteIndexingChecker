@@ -1,0 +1,7 @@
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-158.46.166.29:proxypass1
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-158.46.169.117:proxypass1
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-178.171.58.92:proxypass1
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-178.171.58.97:proxypass1
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-178.171.117.112:proxypass1
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-178.171.117.113:proxypass1
+brd.superproxy.io:22225:brd-customer-c_77d9528b-zone-unblocker-ip-178.171.117.116:proxypass1
