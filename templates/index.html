@@ -1,8 +1,79 @@
-<!-- FILEPATH: d:\Projects\IsIndexed\templates\index.html -->
 <html>
-<form action="/check" method="POST">
-    <label for="search">Search:</label>
-    <input type="text" id="search" name="query">
-    <button type="submit">Search</button>
-</form>
+
+<head>
+    <title>Webpage Indexing Tracker</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="title-container">
+            <h1>Webpage Indexing Tracker</h1>
+        </div>
+        <div class="form-container">
+            <h2> Upload Sitemaps</h2>
+            <form action="/check" method="post">
+                <div>
+                    <label for="xml-url">Sitemap URL</label>
+                    <input class="text-input" type="text" name="xml-url" placeholder="https://example.com/sitemap.xml"
+                        title="This sitemap will be parsed for urls and checked for indexing" required>
+                </div>
+                <div>
+                    <label for="max-search-count">Limit Checks</label>
+                    <input class="max-search-count text-input" type="number" min="1" max="100" value="2"
+                        name="max-search-count" placeholder="100" required
+                        title="The Maximum Limit You want us to Index per sitemap provided. An API Key has limited uses. Free(100)">
+                </div>
+
+                <details>
+                    <summary>Custom API</summary>
+                    <div class="detail-holder">
+                        <div>
+                            <label for="api-key">Google Search Engine API Key</label>
+                            <input class="text-input" type="text" name="api-key"
+                                title="Enter custom Google Search Engine API key"
+                                placeholder="AIzaSyAaujr.....x9lQVFrJz16IM">
+
+                        </div>
+                        <div>
+                            <label for="search-engine-id">Google Search Engine Id</label>
+                            <input class="text-input" type="text" name="search-engine-id"
+                                title="Enter Search Engine Id (cx)" placeholder="a167b3....424087">
+                        </div>
+                    </div>
+                    <p class="fineprint">*if empty will use the default</p>
+                </details>
+
+                <input class="submit-button" type="submit" value="Start"
+                    title="Starts the Url hunt and checks for indexing based on set count.">
+            </form>
+
+            <div class="link-to-sheet">
+                <a href="{{url_to_sheets}}" target="_blank"> Open Sheets</a>
+            </div>
+        </div>
+        <div id="progress-container" class="progress-container">
+            <div class="progress-text">
+                <pre id="progress"></pre>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        var res;
+        setInterval(async () => {
+            res = await fetch("http://" + document.domain + ":" + location.port + "/api");
+            text = await res.text();
+            text_as_json = JSON.parse(text);
+            if (text_as_json["progress"] != "")
+                document.getElementById("progress").innerHTML = text_as_json["progress"];
+
+        }, 2000)
+
+    </script>
+
+</body>
+
 </html>
