@@ -16,6 +16,8 @@ class ProxyManager:
 
     def get_proxy_for_request(self) -> dict:
         p = self.current_proxy.split(":")
+        if(len(p) < 4):
+            return None
         proxy = p[2] + ":" + p[3] + "@" + p[0] + ":" + p[1]
         proxies = {"http": "http://" + proxy, "https": "http://" + proxy}
         return proxies

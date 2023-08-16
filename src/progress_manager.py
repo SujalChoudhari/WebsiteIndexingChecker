@@ -2,6 +2,8 @@ class ProgressManager:
     progress = "All Systems Running"
     is_working = "False"
 
+    done_message = "Progress completed!"
+
     @staticmethod
     def update_progress(text, is_working=True):
         ProgressManager.progress = text

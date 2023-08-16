@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import bs4
+import time
 from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
@@ -42,6 +43,7 @@ class Indexer:
             
             if fail_count > 10:
                 ProgressManager.update_progress("Failed more than 10 times! Exiting Process...")
+                ProgressManager.done_message = "Failed more than 10 times! Exiting Process..."
                 return
             
             if self.url_manager.current_url_index % 20 == 0:
@@ -68,6 +70,11 @@ class Indexer:
     def proxy_request(self, url, **kwargs):
         while self.proxy_manager.get_remaining_proxies_amount() > 0:
             current_proxy = self.proxy_manager.get_proxy_for_request()
+
+            if current_proxy is None:
+                ProgressManager.update_progress("No proxies found! Using normal request...")
+                return requests.get(url, **kwargs)
+
             print("Using Proxy: ", current_proxy["http"], end=" ")
             try:
                 response = requests.get(url, proxies=current_proxy, timeout=8)
@@ -85,6 +92,8 @@ class Indexer:
                 self.proxy_manager.update_proxy()
 
         print("No proxies left!")
+        ProgressManager.update_progress("No proxies left! Using normal request...")
+        time.sleep(1)
         response = requests.get(url, **kwargs)
         if response.status_code != 200:
             print("Failed to get response from url: ", url)
