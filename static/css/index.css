@@ -16,11 +16,11 @@ body {
     flex-direction: column;
 }
 
-.container{
+.container {
     background-image: url(https://www.techwhoop.com/wp-content/uploads/2020/07/20190617e161dc7e-0028-e63c-27e3-ee15ed742bf9.png) !important;
     background-position-y: bottom;
     background-size: 80vw;
-    background-repeat:repeat-x;
+    background-repeat: repeat-x;
 }
 
 
@@ -43,13 +43,12 @@ body {
 
 .link-to-sheet a:hover {
     color: #DD3333;
-
     text-decoration: none;
 }
 
 .link-to-sheet {
-    transform: translate(0, 6vh);
-    align-self: flex-end;
+    align-self: flex-start;
+    margin: 10px;
 }
 
 .form-container {
@@ -58,11 +57,26 @@ body {
     align-items: center;
     flex-direction: column;
     margin-top: 10vh;
-    padding: 7vh;
     font-family: Muli !important;
     border: 2px solid #e6e6e6 !important;
-    background-color: #fcfcfc;
+}
 
+.form-container::before {
+    content: "";
+    opacity: 0.5;
+    position: relative;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background-image: url(https://www.techwhoop.com/wp-content/uploads/2020/07/20190617e161dc7e-0028-e63c-27e3-ee15ed742bf9.png);
+    background-repeat: repeat-x;
+    background-size: 70vw;
+    background-position: bottom;
+    transform: rotate(180deg);
+    /* Rotate the background image */
+    z-index: 10;
 }
 
 .progress-container {
@@ -80,19 +94,19 @@ body {
 
 .progress-text {
     font-size: 2vh;
-    
-    color: #8d89fe;
+
+    color: #6b65ff;
 }
 
 .form-container h2 {
-    width: 50vw;
+    width: 30vw;
     margin-bottom: 3vh;
 }
 
 form {
     display: flex;
-    justify-content: space-evenly;
-    align-items:end;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
 }
 
@@ -100,48 +114,75 @@ form div {
     margin: 1vh;
 }
 
-.text-input {
-    padding: 1vh;
-    width: 30vw;
-}
-
-
-details summary {
-    cursor: pointer;
-}
-details {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-details .detail-holder {
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
-    align-items:end;
-    flex-direction: column;
-}
-
-details input {
-    margin: 1vh;
-}
 
 .submit-button {
-    margin-top: 3vh;
-    padding: 2%;
-    width: 10vw;
+    margin: 10px 30px 0 0;
+    padding: 10px;
+    width: 150px;
     background-color: #DD3333;
     color: white;
     border: none;
     border-radius: 1px;
     cursor: pointer;
+    align-self: flex-end;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform .2s ease-out;
+}
+
+.submit-button:hover {
+    transform: scale(1.1);
+}
+
+.submit-button:active {
+    transform: scale(1.05);
 }
 
 
-.fineprint {
-    font-size: 2vh;
-    color: #444;
+.file-input {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 40vw;
+}
+
+.file-input input {
+    width: 50%;
+    cursor: pointer;
+}
+
+.file-input label {
+    width: 50%;
+    margin-bottom: 1vh;
+    cursor: pointer;
+    display: flex;
+    text-align: right;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+}
+
+
+.file-input input[type="file"] {
+    padding: 1vh;
+    background-color: #e6e6e6;
+    margin-left: 2vw;
+    color: #000;
+}
+
+.file-input input[type="file"]::-webkit-file-upload-button {
+    padding: 1vh;
+    background-color: #DD3333;
+    cursor: pointer;
+    color: white;
+    border: none;
+    margin-right: 2vw;
+    transition: 0.2s ease;
+}
+
+.file-input input[type="file"]::-webkit-file-upload-button:hover {
+    transform: scale(1.1);
 }

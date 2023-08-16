@@ -2,16 +2,19 @@ import numpy as np
 import bs4
 import requests
 from src.sheet_manager import SpreadsheetManager
+
+
 class URLManager:
-    def __init__(self,sheet_manager:SpreadsheetManager):
+    def __init__(self, sheet_manager: SpreadsheetManager):
         self.sitemaps = np.array(sheet_manager.get_sitemaps())
         self.urls = np.array([])
+        self.current_url_index = 0
 
     def process(self):
         for sitemap in self.sitemaps:
             self.urls = np.append(self.urls, self.get_url_from_xml(sitemap))
 
-    def get_url_from_xml(self,xml_url):
+    def get_url_from_xml(self, xml_url):
         if not xml_url.endswith(".xml"):
             return [xml_url]
         res = requests.get(xml_url)
@@ -26,8 +29,13 @@ class URLManager:
                 result_urls.append(url)
 
         return result_urls
-    
+
+    def has_more_urls(self):
+        return self.current_url_index < len(self.urls)
+
     def get_next_url(self):
+        if self.current_url_index < len(self.urls):
+            self.current_url_index += 1
         if len(self.urls) == 0:
             return None
-        return self.urls[0]
+        return self.urls[self.current_url_index]

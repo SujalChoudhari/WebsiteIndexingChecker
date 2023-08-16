@@ -11,13 +11,13 @@
             <h1>Webpage Indexing Tracker</h1>
         </div>
         <div class="form-container">
-            <h2> Upload Sitemaps</h2>
+            <h2> Upload Proxy Server List</h2>
             <form action="/check" method="post" enctype="multipart/form-data">
-            
-                <div>
-                    <label for="max-search-count">Proxy File</label>
-                    <input class="max-search-count text-input" type="file" min="1" max="100" value="2"
-                        name="proxy-file" placeholder="100" required
+
+
+                <div class="file-input">
+                    <label for="file">Select a file with proxy servers in it</label>
+                    <input type="file" id="file" class="file" name="proxy-file" required
                         title="A file with proxies for checking (seperate by newline)">
                 </div>
 
@@ -31,23 +31,37 @@
         </div>
         <div id="progress-container" class="progress-container">
             <div class="progress-text">
-                <pre id="progress"></pre>
+                <pre id="progress">Click `Start` to update list of unindexed URLs</pre>
             </div>
 
         </div>
-
     </div>
 
     <script>
         var res;
-        setInterval(async () => {
-            res = await fetch("http://" + document.domain + ":" + location.port + "/api");
-            text = await res.text();
-            text_as_json = JSON.parse(text);
-            if (text_as_json["progress"] != "")
-                document.getElementById("progress").innerHTML = text_as_json["progress"];
 
-        }, 20000)
+        const updateProgress = async () => {
+            const res = await fetch("http://" + document.domain + ":" + location.port + "/api");
+            const text = await res.text();
+            const text_as_json = JSON.parse(text);
+
+            if (text_as_json["progress"] !== "") {
+                document.getElementById("progress").innerHTML = text_as_json["progress"];
+            }
+
+            if (text_as_json["is_working"] === "True") {
+                setTimeout(updateProgress, 1000);
+            }
+
+        };
+
+        const buttonEl = document.querySelector(".submit-button");
+        buttonEl.addEventListener("click", () => {
+            document.getElementById("progress").innerHTML = "Starting...";
+            updateProgress();
+        });
+
+
 
     </script>
 

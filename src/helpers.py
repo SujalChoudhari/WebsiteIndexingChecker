@@ -1,6 +1,6 @@
 URL_TO_SHEETS = "https://docs.google.com/spreadsheets/d/1up6bYQj2X5XoYfS9aN8zAT5oz8dFQIGZlXCr_Madgug/edit#gid=1700410190"
 SERVICE_ACCOUNT_FILENAME = "service_account.json"
-PROGRESS = "All Systems Running"
+
 
 
 REQUEST_HEADERS = {
