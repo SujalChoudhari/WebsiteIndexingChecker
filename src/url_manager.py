@@ -13,6 +13,8 @@ class URLManager:
     def process(self):
         for sitemap in self.sitemaps:
             self.urls = np.append(self.urls, self.get_url_from_xml(sitemap))
+        self.urls = np.unique(self.urls)
+
 
     def get_url_from_xml(self, xml_url):
         if not xml_url.endswith(".xml"):
