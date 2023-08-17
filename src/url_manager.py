@@ -15,7 +15,6 @@ class URLManager:
             self.urls = np.append(self.urls, self.get_url_from_xml(sitemap))
         self.urls = np.unique(self.urls)
 
-
     def get_url_from_xml(self, xml_url):
         if not xml_url.endswith(".xml"):
             return [xml_url]
@@ -29,7 +28,6 @@ class URLManager:
                 result_urls.extend(self.get_url_from_xml(url))
             else:
                 result_urls.append(url)
-
         return result_urls
 
     def has_more_urls(self):

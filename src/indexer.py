@@ -50,7 +50,7 @@ class Indexer:
                 ProgressManager.done_message = "Failed more than 10 times! Exiting Process..."
                 return
             
-            if self.url_manager.current_url_index % 20 == 0:
+            if self.url_manager.current_url_index % 50 == 0:
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")
                 self.sheet_manager.save_unindexed_to_sheets()
 

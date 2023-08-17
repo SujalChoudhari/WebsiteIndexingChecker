@@ -46,17 +46,17 @@ def check():
         ProgressManager.update_progress("Failed to load spreadsheet: " + str(e),False)
         return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS, error=f"Failed to load spreadsheet: {e}")
 
-    # try:
-    # run the checks
-    index_checker = Indexer(proxy_manager, url_manager, spreadsheet_manager)
-    index_checker.process()
-    ProgressManager.update_progress("Checks Complete")
+    try:
+        # run the checks
+        index_checker = Indexer(proxy_manager, url_manager, spreadsheet_manager)
+        index_checker.process()
+        ProgressManager.update_progress("Checks Complete")
 
-    # save unindexed
-    spreadsheet_manager.save_unindexed_to_sheets()
-    # except Exception as e:
-    #     ProgressManager.update_progress("Failed to run checks: " + str(e),False)
-    #     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS, error=f"Failed to run checks: {e}")
+        # save unindexed
+        spreadsheet_manager.save_unindexed_to_sheets()
+    except Exception as e:
+        ProgressManager.update_progress("Failed to run checks: " + str(e),False)
+        return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS, error=f"Failed to run checks: {e}")
 
     ProgressManager.update_progress("Done!", is_working=True)
     return flask.render_template("done.html", message=ProgressManager.done_message)
@@ -67,7 +67,3 @@ def return_data():
     return flask.jsonify(
         progress=ProgressManager.progress, is_working=ProgressManager.is_working
     )
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
