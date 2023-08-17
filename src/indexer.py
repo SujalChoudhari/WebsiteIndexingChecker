@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import bs4
+import re
 import time
 from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
@@ -37,6 +38,9 @@ class Indexer:
             if not is_indexed and status == "checked":
                 self.sheet_manager.add_unindexed_url(url)
 
+            if status == "end":
+                break
+
             if status == "failed":
                 ProgressManager.update_progress("Failed to get response from url: " + url)
                 fail_count += 1
@@ -50,22 +54,26 @@ class Indexer:
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")
                 self.sheet_manager.save_unindexed_to_sheets()
 
+            
+
 
     def check_next_url(self):
         current_url = self.url_manager.get_next_url()
-        response = self.proxy_request(INDEXING_SEARCH_STRING.format(current_url))
-        if response.status_code != 200:
-            return current_url, False, "failed"
-        
-        soup = bs4.BeautifulSoup(response.text, "html.parser")
-        result = soup.find_all("a", href=True)
-        result = [x["href"] for x in result]
-
-        for url in result:
-            if current_url in url:
+        if current_url is None:
+            return "none", False, "end"
+        try:
+            response = self.proxy_request(INDEXING_SEARCH_STRING.format(current_url))
+            response.raise_for_status()
+            soup = bs4.BeautifulSoup(response.text, "html.parser")
+            not_indexed_regex = re.compile("did not match any documents")
+            if soup(text=not_indexed_regex):
+                return current_url, False, "checked"
+            else:
                 return current_url, True, "checked"
-
-        return current_url, False, "checked"
+            
+        except Exception as e:
+            print("Error: ", e)
+            return current_url, False, "failed"
 
     def proxy_request(self, url, **kwargs):
         while self.proxy_manager.get_remaining_proxies_amount() > 0:
@@ -75,12 +83,11 @@ class Indexer:
                 ProgressManager.update_progress("No proxies found! Using normal request...")
                 return requests.get(url, **kwargs)
 
-            print("Using Proxy: ", current_proxy["http"], end=" ")
+            print("Using Proxy: ", current_proxy["http"])
             try:
                 response = requests.get(url, proxies=current_proxy, timeout=8)
                 if response.status_code == 200:
                     print("\tSuccess!")
-                    self.proxy_manager.update_proxy()
                     return response
                 else:
                     print("\tFailed!")

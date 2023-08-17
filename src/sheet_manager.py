@@ -34,13 +34,17 @@ class SpreadsheetManager:
         return sitemaps.tolist()
 
     def save_unindexed_to_sheets(self):
-        if(len(self.unindexed_urls) == 0):
-            return
         self.update_unindexed_sheet_with(self.unindexed_urls)
 
-    def update_unindexed_sheet_with(self, data: list):
+
+    def update_unindexed_sheet_with(self, list_of_urls: list):
+        if(len(list_of_urls) == 0):
+            return
         self.unindexed_sheet.clear()  # Clear the existing content
-        self.unindexed_sheet.append_rows(data)  # Append the new data
+        print("Updating unindexed sheet with:", list_of_urls)
+        # Convert the list of URLs into a two-dimensional list using numpy
+        urls_2d = np.array(list_of_urls).reshape(-1, 1).tolist()
+        self.unindexed_sheet.append_rows(urls_2d)
 
 
 if __name__ == "__main__":

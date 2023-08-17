@@ -1,6 +1,6 @@
 class ProgressManager:
     progress = "All Systems Running"
-    is_working = "False"
+    is_working = "True"
 
     done_message = "Progress completed!"
 

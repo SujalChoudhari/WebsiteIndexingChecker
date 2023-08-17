@@ -34,8 +34,8 @@ class URLManager:
         return self.current_url_index < len(self.urls)
 
     def get_next_url(self):
-        if self.current_url_index < len(self.urls):
+        if self.current_url_index + 1 < len(self.urls):
             self.current_url_index += 1
-        if len(self.urls) == 0:
+            return self.urls[self.current_url_index]
+        else:
             return None
-        return self.urls[self.current_url_index]
