@@ -1,10 +1,21 @@
-import numpy as np
-import bs4
 import requests
+import bs4
+import numpy as np
 from src.sheet_manager import SpreadsheetManager
 
 
 class URLManager:
+    """
+        # URLManager
+        URLManager keeps track of urls, and also how many urls have been checked.
+        All the URLs are stored as a numpy array, for faster processing.
+        It also gets the URLs from the sitemap files, via the `SpreadsheetManager`
+
+        Note:
+        - URLManager is not responsible for checking if the url is indexed
+        - It only gets all the unique urls from the sitemap files
+        - It returns a url one by one to the indexer
+    """
     def __init__(self, sheet_manager: SpreadsheetManager):
         self.sitemaps = np.array(sheet_manager.get_sitemaps())
         self.urls = np.array([])

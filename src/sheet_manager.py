@@ -1,10 +1,25 @@
-import gspread
 import numpy as np
-import os
-from src.helpers import URL_TO_SHEETS
+import gspread
+from constants import URL_TO_SHEETS
 
 
 class SpreadsheetManager:
+    """
+        # SpreadsheetManager
+        SpreadsheetManager is a class that manages the spreadsheet.  
+        It is a wrapper for the gspread library, specifically to manage the particular spreadsheet.
+        It is responsible for getting the sitemap urls from the spreadsheet named `Sitemaps`
+        It is also responsible for saving the unindexed urls to the spreadsheet named `Unindexed`
+
+        # Requirements
+        - The spreadsheet must have two sheets (worksheets) named `Sitemaps` and `Unindexed`. If there are no sheets with those names, they will be created.
+        - The spreadsheet must be shared with the service account email address. This is found in the `SERVICE_ACCOUNT` file.
+
+        # Note:
+        - While saving the unindexed urls, it will delete the older urls and replace them with the new ones.
+        - The spreadsheet is updated in realtime, so you can watch the progress of the script by opening the spreadsheet.
+
+    """
     def __init__(self, filename: str, url_to_sheet: str):
         self.gc = gspread.service_account(filename=filename)
         self.spreadsheet = self.gc.open_by_url(url_to_sheet)
