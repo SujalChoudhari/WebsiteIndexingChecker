@@ -93,7 +93,7 @@ class Indexer:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
             if current_proxy is None:
-                ProgressManager.update_progress("No proxies found! Using normal request...")
+                ProgressManager.update_progress("All given proxy failed")
                 return requests.get(url, **kwargs)
 
             print("\n\nUsing Proxy: ", current_proxy["http"])
