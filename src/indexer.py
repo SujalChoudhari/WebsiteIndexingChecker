@@ -105,21 +105,10 @@ class Indexer:
                     self.proxy_manager.update_proxy()
                     return response
                 else:
-                    print("\tFailed!")
+                    print("\tFailed!",response.status_code)
                     fail_count += 1
                     self.proxy_manager.update_proxy()
             except Exception as e:
                 print("\tFailed!",e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
-            
-            if fail_count > 5:
-                break
-
-        print("No proxies left!")
-        ProgressManager.update_progress("No working proxies left! Using normal request...")
-        self.proxy_manager.update_proxy()
-        response = requests.get(url, **kwargs)
-        if response.status_code != 200:
-            print("Failed to get response from url: ", url)
-        return response

@@ -34,10 +34,8 @@ class URLManager:
         urls = soup.find_all("loc")
         result_urls = []
         for url in urls:
-            url = url.text
-            if url.endswith(".xml"):
-                result_urls.extend(self.get_url_from_xml(url))
-            else:
+            if url.prefix != "image":
+                url = url.text
                 result_urls.append(url)
         return result_urls
 
