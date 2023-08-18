@@ -29,6 +29,7 @@
 
     <script>
         setInterval(async () => {
+            // const res = await fetch("http://" + document.domain + ":" + location.port + "/api");
             const res = await fetch("https://" + document.domain + ":" + location.port + "/api");
             const text = await res.text();
             const text_as_json = JSON.parse(text);
@@ -43,11 +44,7 @@
                 document.getElementsByClassName("progress-filler")[0].style.width = width_in_percent + "%";
             }
             document.getElementById("progress").innerHTML = text_as_json["progress"];
-        }, 1000)
-
-
-
-
+        }, 2000)
     </script>
 </body>
 

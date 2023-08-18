@@ -4,7 +4,7 @@ class ProgressManager:
         Keeps track of progress and updates the front-end via /api route
     """
 
-    progress = "All Systems Running"
+    progress = "Working ..."
     is_working = "True"
     done_message = "Process completed!"
 

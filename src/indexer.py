@@ -7,7 +7,7 @@ from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
 from src.progress_manager import ProgressManager
-from src.constants import INDEXING_SEARCH_STRING
+from src.constants import INDEXING_SEARCH_STRING,REQUEST_HEADERS
 
 class Indexer:
     """
@@ -100,7 +100,7 @@ class Indexer:
 
             print("\n\nUsing Proxy: ", current_proxy["http"])
             try:
-                response = requests.get(url, proxies=current_proxy, timeout=8)
+                response = requests.get(url, proxies=current_proxy, timeout=20,headers=REQUEST_HEADERS)
                 if response.status_code == 200:
                     print("\tSuccess!")
                     self.proxy_manager.update_proxy()
@@ -108,12 +108,14 @@ class Indexer:
                 else:
                     print("\tFailed!",response.status_code)
                     ProgressManager.update_progress("Proxy failed with status code: " + str(response.status_code))
-                    time.sleep(1)
+                    time.sleep(2)
                     self.proxy_manager.update_proxy()
             except Exception as e:
                 print("\tFailed!", e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
+                break
 
-        ProgressManager.update_progress(f"Request failed {max_failures} times! Giving up...")
-        return requests.get(url,timeout=8)
+        ProgressManager.update_progress(f"Request failed! {e.__class__.__name__}, ")
+        time.sleep(5)
+        return requests.get(url,timeout=20)
