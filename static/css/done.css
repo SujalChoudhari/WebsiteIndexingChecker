@@ -34,17 +34,25 @@ body>div>h3 {
     top: 0;
     color: #fff;
     background-color: #000;
-    padding: 1vh 0;
+    padding: 3vh 0;
     /* Vertical padding */
     width: 100%;
     text-align: center;
+}
+
+a {
+    text-decoration: none;
 }
 
 /* Apply styles to the p element */
 body>div>a>p {
     font-size: 2vh;
     color: #6b65ff;
-    /* margin: 0 1vh; */
+    text-decoration: none;
+}
+
+div>a>p:hover {
+    color: #DD3333;
 }
 
 /* Apply styles to the submit button */
@@ -69,4 +77,20 @@ body>div>p:hover {
 
 a {
     margin-top: 60px;
+}
+
+.link-to-sheet a {
+    color: #020202;
+    text-decoration: none;
+}
+
+.link-to-sheet a:hover {
+    color: #DD3333;
+    text-decoration: none;
+}
+
+.link-to-sheet {
+    align-self: center;
+    justify-content: center;
+    margin: 10px;
 }

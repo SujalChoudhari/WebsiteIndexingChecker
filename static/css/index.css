@@ -57,7 +57,6 @@ body {
     align-items: center;
     flex-direction: column;
     margin-top: 10vh;
-    font-family: Muli !important;
     border: 2px solid #e6e6e6 !important;
 }
 
@@ -79,24 +78,6 @@ body {
     z-index: 10;
 }
 
-.progress-container {
-    display: flex;
-    justify-content: center;
-    width: 50vw;
-    align-items: center;
-    flex-direction: column;
-    margin-top: 8vh;
-    padding: 1vh;
-    font-family: Muli !important;
-    border: 2px solid #e6e6e6 !important;
-    background-color: #fcfcfc;
-}
-
-.progress-text {
-    font-size: 2vh;
-
-    color: #6b65ff;
-}
 
 .form-container h2 {
     width: 30vw;
@@ -136,6 +117,7 @@ form div {
 }
 
 .submit-button:active {
+    background-color: cornflowerblue;
     transform: scale(1.05);
 }
 

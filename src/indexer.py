@@ -1,4 +1,3 @@
-import time
 import re
 import requests
 import bs4
@@ -42,10 +41,9 @@ class Indexer:
     def process(self):
         fail_count = 0
         while self.url_manager.has_more_urls():
-            ProgressManager.update_progress("Progress: {}/{}, Consistent Fails: {}".format(
+            ProgressManager.update_progress("Progress: {}/{}".format(
                 self.url_manager.current_url_index,
-                len(self.url_manager.urls),
-                fail_count
+                len(self.url_manager.urls)
             ))
 
             url, is_indexed, status = self.check_next_url()
@@ -101,14 +99,15 @@ class Indexer:
                 response = requests.get(url, proxies=current_proxy, timeout=8)
                 if response.status_code == 200:
                     print("\tSuccess!")
-                    self.proxy_manager.current_proxy_worked()
                     self.proxy_manager.update_proxy()
                     return response
                 else:
                     print("\tFailed!",response.status_code)
-                    fail_count += 1
                     self.proxy_manager.update_proxy()
             except Exception as e:
                 print("\tFailed!",e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
+
+                if fail_count > 30:
+                    return requests.get(url,timeout=8)

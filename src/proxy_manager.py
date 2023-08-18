@@ -22,7 +22,6 @@ class ProxyManager:
         self.proxies = np.array(proxies)
         self.available_proxies_index = np.arange(len(self.proxies))
         self.current_index = 0
-        self.working_proxies = np.array([])
         self.current_proxy = None
         self.update_proxy()
 
@@ -39,22 +38,13 @@ class ProxyManager:
         proxy = p[2] + ":" + p[3] + "@" + p[0] + ":" + p[1]
         return {"http": "http://" + proxy, "https": "http://" + proxy}
 
-
-    def current_proxy_worked(self):
-        self.working_proxies = np.append(self.working_proxies,self.current_index)
-        self.working_proxies = np.unique(self.working_proxies)
-
     def update_proxy(self):
         proxy_index = 0
-        if(self.available_proxies_index.size != 0):
-            proxy_index = self.available_proxies_index[0]
-            self.available_proxies_index = np.delete(self.available_proxies_index, 0)
-        elif (self.working_proxies.size != 0) :
-            proxy_index = np.random.choice(self.working_proxies)
-        else:
-            self.current_index = 0
-            self.current_proxy = None
-            return
+        if(self.available_proxies_index.size == 0):
+            self.reset_chain()
+        
+        proxy_index = self.available_proxies_index[0]
+        self.available_proxies_index = np.delete(self.available_proxies_index, 0)
         
         self.current_index = proxy_index
         self.current_proxy = self.proxies[proxy_index]
@@ -62,11 +52,11 @@ class ProxyManager:
 
     def reset_chain(self):
         self.shuffle_proxies()
-        self.working_proxies = np.array([])
-
+        self.available_proxies_index = np.arange(len(self.proxies))
+        
     def get_proxy_list(self):
         return self.proxies.tolist()
 
     def get_remaining_proxies_amount(self):
-        return len(self.working_proxies)
+        return len(self.proxies)
 

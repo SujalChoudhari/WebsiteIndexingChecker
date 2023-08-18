@@ -4,19 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Done Processing</title>
+    <title>Done Processing | Google Index Checker</title>
     <link rel="stylesheet" href="{{url_for('static', filename='css/done.css')}}">
 </head>
 
 <body>
     <div>
-        <h3>Done!</h3>
+        <h3>Google Index Checking Done!</h3>
         <button>
             {{message}}
         </button>
         <a href="./">
             <p>Back to home page</p>
         </a>
+        <div class="link-to-sheet">
+            <a href="{{url_to_sheets}}" target="_blank"> Open Sheets</a>
+        </div>
     </div>
 </body>
 

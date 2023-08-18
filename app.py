@@ -40,6 +40,7 @@ def checker(proxy_file):
 
     try:
         # run the checks
+        ProgressManager.update_progress("Checking URLs ...")
         index_checker = Indexer(proxy_manager, url_manager, spreadsheet_manager)
         index_checker.process()
         ProgressManager.update_progress("Checks Complete")
@@ -50,7 +51,7 @@ def checker(proxy_file):
         print(e)
         ProgressManager.update_progress("Failed to run checks: " + str(e),False)
 
-    ProgressManager.update_progress("Done!", is_working=True)
+    ProgressManager.update_progress("Done!", is_working=False)
 
 @app.route("/",methods=['GET','POST'])
 def index():
@@ -61,7 +62,7 @@ def index():
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
 
-@app.route("/check", methods=["POST"])
+@app.route("/working", methods=["POST"])
 def check():
     """
         The Main function that is ran to check the urls.
@@ -71,7 +72,7 @@ def check():
     proxy_file = flask.request.files["proxy-file"]
     check_thread = threading.Thread(target=checker,args=(proxy_file,))
     check_thread.start()
-    return flask.render_template("index.html", message=ProgressManager.done_message)
+    return flask.render_template("worker.html",url_to_sheets=URL_TO_SHEETS)
 
 
 @app.route("/api",methods=['GET','POST'])
@@ -82,6 +83,18 @@ def return_data():
     return flask.jsonify(
         progress=ProgressManager.progress, is_working=ProgressManager.is_working
     )
+
+
+@app.route('/done')
+def done():
+    return flask.render_template('done.html',url_to_sheets=URL_TO_SHEETS,message=ProgressManager.done_message)
+
+
+@app.route('/worker')
+def worker():
+    return flask.render_template('worker.html',message=ProgressManager.done_message)
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
