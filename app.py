@@ -9,6 +9,7 @@ from src.progress_manager import ProgressManager
 from src.constants import URL_TO_SHEETS, SERVICE_ACCOUNT_FILENAME
 
 app = flask.Flask(__name__)
+check_lock = threading.Lock() 
 
 def checker(proxy_file):
     """
@@ -58,7 +59,7 @@ def index():
     """
         Homepage route
     """
-    ProgressManager.update_progress("All Systems Running")
+    ProgressManager.update_progress("All Systems Running",True)
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
 
@@ -70,9 +71,16 @@ def check():
         Renders a done page when finished, with a message, or an error page if something went wrong
     """
     proxy_file = flask.request.files["proxy-file"]
-    check_thread = threading.Thread(target=checker,args=(proxy_file,))
-    check_thread.start()
-    return flask.render_template("worker.html",url_to_sheets=URL_TO_SHEETS)
+
+    if check_lock.acquire(blocking=False):  # Attempt to acquire the lock
+        try:
+            check_thread = threading.Thread(target=checker, args=(proxy_file,))
+            check_thread.start()
+            return flask.render_template("worker.html", url_to_sheets=URL_TO_SHEETS)
+        finally:
+            check_lock.release()  # Release the lock after thread execution
+    else:
+        return "Please Wait, Another thread is already running.", 503  # Service Unavailable
 
 
 @app.route("/api",methods=['GET','POST'])
@@ -88,12 +96,6 @@ def return_data():
 @app.route('/done')
 def done():
     return flask.render_template('done.html',url_to_sheets=URL_TO_SHEETS,message=ProgressManager.done_message)
-
-
-@app.route('/worker')
-def worker():
-    return flask.render_template('worker.html',message=ProgressManager.done_message)
-
 
 
 if __name__ == "__main__":

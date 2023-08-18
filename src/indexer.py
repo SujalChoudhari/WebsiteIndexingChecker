@@ -19,7 +19,7 @@ class Indexer:
         - Check if the url is indexed
             - use requests to get the html of the url
             - use bs4 to parse the html
-            c. use regex to find the indexing string
+            - use regex to find the indexing string
         - If the url is indexed, mark it as indexed in the url manager
         - If the url is not indexed, mark it as not indexed in the url manager
         - If a proxy fails, mark it as failed in the proxy manager
@@ -73,7 +73,8 @@ class Indexer:
             return "none", False, "end"
         try:
             response = self.proxy_request(INDEXING_SEARCH_STRING.format(current_url))
-            response.raise_for_status()
+            if response.status_code != 200:
+                return current_url, False, "failed"
             soup = bs4.BeautifulSoup(response.text, "html.parser")
             not_indexed_regex = re.compile("did not match any documents")
             if soup(text=not_indexed_regex):
@@ -87,7 +88,8 @@ class Indexer:
 
     def proxy_request(self, url, **kwargs):
         fail_count = 0
-        while True:
+        max_failures = 3  # Adjust this threshold as needed
+        while fail_count < max_failures:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
             if current_proxy is None:
@@ -105,9 +107,9 @@ class Indexer:
                     print("\tFailed!",response.status_code)
                     self.proxy_manager.update_proxy()
             except Exception as e:
-                print("\tFailed!",e)
+                print("\tFailed!", e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
 
-                if fail_count > 30:
-                    return requests.get(url,timeout=8)
+        ProgressManager.update_progress(f"Request failed {max_failures} times! Giving up...")
+        return requests.get(url,timeout=8)
