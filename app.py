@@ -1,4 +1,5 @@
 import flask
+import os
 from src.progress_manager import ProgressManager
 from src.constants import URL_TO_SHEETS
 from src.checker import checker
@@ -35,3 +36,6 @@ def return_data():
     return flask.jsonify(
         progress=ProgressManager.progress, is_working=ProgressManager.is_working
     )
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
