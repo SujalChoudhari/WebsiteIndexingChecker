@@ -1,6 +1,7 @@
 import re
 import requests
 import bs4
+import time
 import numpy as np
 from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
@@ -47,6 +48,7 @@ class Indexer:
             ))
 
             url, is_indexed, status = self.check_next_url()
+            time.sleep(1)
             print("URL " + url + " is indexed: " + str(is_indexed) + " Status: " + status)
             if not is_indexed and status == "checked":
                 self.sheet_manager.add_unindexed_url(url)
@@ -105,6 +107,8 @@ class Indexer:
                     return response
                 else:
                     print("\tFailed!",response.status_code)
+                    ProgressManager.update_progress("Proxy failed with status code: " + str(response.status_code))
+                    time.sleep(1)
                     self.proxy_manager.update_proxy()
             except Exception as e:
                 print("\tFailed!", e)
