@@ -31,31 +31,34 @@ class ProxyManager:
         np.random.shuffle(self.remaining_indices)
 
     def get_proxy_for_request(self):
+        if len(self.remaining_indices) <= 1:
+            self.reset_chain()
+
         p = self.current_proxy.split(":")
         if len(p) < 4:
             return None
         proxy = p[2] + ":" + p[3] + "@" + p[0] + ":" + p[1]
         return {"http": "http://" + proxy, "https": "http://" + proxy}
 
+
     def current_proxy_failed(self):
         self.failed_indices.add(self.current_index)
 
     def update_proxy(self):
-        if not self.remaining_indices:
+        if len(self.remaining_indices) <=1:
             self.reset_chain()
 
         proxy_index = self.remaining_indices.pop(0)
-        while proxy_index in self.failed_indices and len(self.remaining_indices) > 1:
+        while proxy_index in self.failed_indices and len(self.remaining_indices) != 0:
             proxy_index = self.remaining_indices.pop(0)
 
-        if len(self.remaining_indices) == 1:
+        if len(self.remaining_indices) == 0:
             self.failed_indices.clear()
 
         self.current_index = proxy_index
         self.used_indices.add(proxy_index)
         proxy = self.proxies[proxy_index]
         self.current_proxy = proxy  # Set the formatted proxy string
-
         return proxy
 
     def reset_chain(self):

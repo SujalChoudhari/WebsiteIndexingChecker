@@ -1,6 +1,6 @@
 import numpy as np
 import gspread
-from constants import URL_TO_SHEETS
+from src.constants import URL_TO_SHEETS
 
 
 class SpreadsheetManager:

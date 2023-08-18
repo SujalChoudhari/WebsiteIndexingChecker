@@ -1,6 +1,6 @@
 import flask
 from src.progress_manager import ProgressManager
-from constants import URL_TO_SHEETS
+from src.constants import URL_TO_SHEETS
 from src.checker import checker
 
 app = flask.Flask(__name__)

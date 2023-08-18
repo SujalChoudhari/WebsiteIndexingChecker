@@ -7,7 +7,7 @@ from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
 from src.progress_manager import ProgressManager
-from constants import INDEXING_SEARCH_STRING
+from src.constants import INDEXING_SEARCH_STRING
 
 class Indexer:
     """
@@ -42,14 +42,13 @@ class Indexer:
     def process(self):
         fail_count = 0
         while self.url_manager.has_more_urls():
-            ProgressManager.update_progress("Progress: {}/{} Consistent Fails: {}".format(
+            ProgressManager.update_progress("Progress: {}/{}, Consistent Fails: {}".format(
                 self.url_manager.current_url_index,
                 len(self.url_manager.urls),
                 fail_count
             ))
 
             url, is_indexed, status = self.check_next_url()
-            ProgressManager.update_progress("URL " + url + " is indexed: " + str(is_indexed) + " Status: " + status)
             print("URL " + url + " is indexed: " + str(is_indexed) + " Status: " + status)
             if not is_indexed and status == "checked":
                 self.sheet_manager.add_unindexed_url(url)
@@ -59,12 +58,11 @@ class Indexer:
             elif status == "checked":
                 fail_count = 0
             elif status == "failed":
-                ProgressManager.update_progress("Failed to get response from url: " + url)
                 fail_count += 1
             
             if fail_count > 5:
-                ProgressManager.update_progress("Failed more than 10 times! Exiting Process...")
-                ProgressManager.done_message = "Failed more than 10 times! Exiting Process..."
+                ProgressManager.update_progress("Failed consistently more than 5 times! Exiting Process...")
+                ProgressManager.done_message = "Failed consistently 5 times! Exiting Process..."
                 return
             
             if self.url_manager.current_url_index % 50 == 0:
@@ -97,7 +95,7 @@ class Indexer:
                 ProgressManager.update_progress("No proxies found! Using normal request...")
                 return requests.get(url, **kwargs)
 
-            print("Using Proxy: ", current_proxy["http"])
+            print("\n\nUsing Proxy: ", current_proxy["http"])
             try:
                 response = requests.get(url, proxies=current_proxy, timeout=8)
                 if response.status_code == 200:
@@ -115,6 +113,7 @@ class Indexer:
 
         print("No proxies left!")
         ProgressManager.update_progress("No proxies left! Using normal request...")
+        self.proxy_manager.update_proxy()
         time.sleep(1)
         response = requests.get(url, **kwargs)
         if response.status_code != 200:

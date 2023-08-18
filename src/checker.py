@@ -5,7 +5,7 @@ from src.proxy_manager import ProxyManager
 from src.indexer import Indexer
 from src.sheet_manager import SpreadsheetManager
 from src.progress_manager import ProgressManager
-from constants import URL_TO_SHEETS, SERVICE_ACCOUNT_FILENAME
+from src.constants import URL_TO_SHEETS, SERVICE_ACCOUNT_FILENAME
 
 def checker():
     """
