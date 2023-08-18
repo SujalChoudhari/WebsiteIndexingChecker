@@ -35,7 +35,3 @@ def return_data():
     return flask.jsonify(
         progress=ProgressManager.progress, is_working=ProgressManager.is_working
     )
-
-
-
-app.run(debug=True)
