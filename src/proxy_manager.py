@@ -41,7 +41,7 @@ class ProxyManager:
 
 
     def current_proxy_worked(self):
-        self.working_proxies.add(self.current_index)
+        self.working_proxies = np.append(self.working_proxies,self.current_index)
         self.working_proxies = np.unique(self.working_proxies)
 
     def update_proxy(self):

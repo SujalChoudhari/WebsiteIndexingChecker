@@ -61,8 +61,8 @@ def index():
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
 
-@app.route("/load-proxy", methods=["POST"])
-def load_proxy():
+@app.route("/check", methods=["POST"])
+def check():
     """
         The Main function that is ran to check the urls.
         This route is called by the UI when the user clicks the "Start" button

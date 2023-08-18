@@ -109,7 +109,7 @@ class Indexer:
                     fail_count += 1
                     self.proxy_manager.update_proxy()
             except Exception as e:
-                print("\tFailed!")
+                print("\tFailed!",e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
             
