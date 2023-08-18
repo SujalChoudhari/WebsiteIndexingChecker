@@ -20,6 +20,7 @@ def checker():
         proxies = proxy_file.read().decode("utf-8").split("\n")
         proxy_manager = ProxyManager(proxies)
     except Exception as e:
+        print(e)
         ProgressManager.update_progress("Failed to load proxies: " + str(e),False)
         return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS, error=f"Failed to load proxies: {e}")
 
@@ -33,6 +34,7 @@ def checker():
         url_manager = URLManager(spreadsheet_manager)
         url_manager.process()
     except Exception as e:
+        print(e)
         ProgressManager.update_progress("Failed to load spreadsheet: " + str(e),False)
         return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS, error=f"Failed to load spreadsheet: {e}")
 
@@ -45,6 +47,7 @@ def checker():
         # save unindexed
         spreadsheet_manager.save_unindexed_to_sheets()
     except Exception as e:
+        print(e)
         ProgressManager.update_progress("Failed to run checks: " + str(e),False)
         return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS, error=f"Failed to run checks: {e}")
 

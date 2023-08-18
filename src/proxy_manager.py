@@ -20,20 +20,19 @@ class ProxyManager:
     """
     def __init__(self, proxies: list):
         self.proxies = np.array(proxies)
-        self.failed_indices = set()
-        self.used_indices = set()
+        self.available_proxies_index = np.arange(len(self.proxies))
         self.current_index = 0
-        self.remaining_indices = list(range(len(self.proxies)))
-        self.current_proxy = self.update_proxy()
-        self.shuffle_proxies()
+        self.working_proxies = np.array([])
+        self.current_proxy = None
+        self.update_proxy()
 
     def shuffle_proxies(self) -> None:
-        np.random.shuffle(self.remaining_indices)
+        self.working_proxies = np.unique(self.working_proxies)
+        np.random.shuffle(self.working_proxies)
 
     def get_proxy_for_request(self):
-        if len(self.remaining_indices) <= 1:
-            self.reset_chain()
-
+        if self.current_proxy is None:
+            return None
         p = self.current_proxy.split(":")
         if len(p) < 4:
             return None
@@ -41,40 +40,33 @@ class ProxyManager:
         return {"http": "http://" + proxy, "https": "http://" + proxy}
 
 
-    def current_proxy_failed(self):
-        self.failed_indices.add(self.current_index)
+    def current_proxy_worked(self):
+        self.working_proxies.add(self.current_index)
+        self.working_proxies = np.unique(self.working_proxies)
 
     def update_proxy(self):
-        if len(self.remaining_indices) <=1:
-            self.reset_chain()
-
-        proxy_index = self.remaining_indices.pop(0)
-        while proxy_index in self.failed_indices and len(self.remaining_indices) != 0:
-            proxy_index = self.remaining_indices.pop(0)
-
-        if len(self.remaining_indices) == 0:
-            self.failed_indices.clear()
-
+        proxy_index = 0
+        if(self.available_proxies_index.size != 0):
+            proxy_index = self.available_proxies_index[0]
+            self.available_proxies_index = np.delete(self.available_proxies_index, 0)
+        elif (self.working_proxies.size != 0) :
+            proxy_index = np.random.choice(self.working_proxies)
+        else:
+            self.current_index = 0
+            self.current_proxy = None
+            return
+        
         self.current_index = proxy_index
-        self.used_indices.add(proxy_index)
-        proxy = self.proxies[proxy_index]
-        self.current_proxy = proxy  # Set the formatted proxy string
-        return proxy
+        self.current_proxy = self.proxies[proxy_index]
+
 
     def reset_chain(self):
-        self.remaining_indices.extend(self.used_indices)
-        self.used_indices.clear()
         self.shuffle_proxies()
-
-    def get_used_proxies(self):
-        return [self.proxies[index] for index in self.used_indices]
-
-    def get_remaining_proxies(self):
-        return [self.proxies[index] for index in self.remaining_indices]
+        self.working_proxies = np.array([])
 
     def get_proxy_list(self):
         return self.proxies.tolist()
 
     def get_remaining_proxies_amount(self):
-        return len(self.remaining_indices)
+        return len(self.working_proxies)
 

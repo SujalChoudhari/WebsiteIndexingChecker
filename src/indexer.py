@@ -88,7 +88,8 @@ class Indexer:
             return current_url, False, "failed"
 
     def proxy_request(self, url, **kwargs):
-        while self.proxy_manager.get_remaining_proxies_amount() > 0:
+        fail_count = 0
+        while True:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
             if current_proxy is None:
@@ -100,21 +101,24 @@ class Indexer:
                 response = requests.get(url, proxies=current_proxy, timeout=8)
                 if response.status_code == 200:
                     print("\tSuccess!")
+                    self.proxy_manager.current_proxy_worked()
                     self.proxy_manager.update_proxy()
                     return response
                 else:
                     print("\tFailed!")
+                    fail_count += 1
                     self.proxy_manager.update_proxy()
-                    self.proxy_manager.current_proxy_failed()
             except Exception as e:
                 print("\tFailed!")
-                self.proxy_manager.current_proxy_failed()
+                fail_count += 1
                 self.proxy_manager.update_proxy()
+            
+            if fail_count > 5:
+                break
 
         print("No proxies left!")
-        ProgressManager.update_progress("No proxies left! Using normal request...")
+        ProgressManager.update_progress("No working proxies left! Using normal request...")
         self.proxy_manager.update_proxy()
-        time.sleep(1)
         response = requests.get(url, **kwargs)
         if response.status_code != 200:
             print("Failed to get response from url: ", url)
