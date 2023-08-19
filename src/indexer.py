@@ -91,7 +91,7 @@ class Indexer:
     def proxy_request(self, url, **kwargs):
         fail_count = 0
         max_failures = 3  # Adjust this threshold as needed
-        print("Evaluating: ", self.proxy_manager.current_index)
+        print("Evaluating: ", self.url_manager.current_url_index, "URL: ", url)
         while fail_count < max_failures:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
@@ -107,8 +107,8 @@ class Indexer:
                     return response
                 else:
                     print("Failed!",response.status_code)
-                    ProgressManager.update_progress("Proxy failed with status code: " + str(response.status_code))
-                    time.sleep(2)
+                    ProgressManager.update_progress("Proxy failing with status code: " + str(response.status_code))
+                    time.sleep(0.5)
                     self.proxy_manager.update_proxy()
             except Exception as e:
                 print("Failed!", e)

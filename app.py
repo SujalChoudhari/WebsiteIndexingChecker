@@ -1,5 +1,4 @@
 import flask
-import os
 import threading
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
@@ -37,6 +36,10 @@ def check():
         This organizes the flow of the program
         Checks for any errors and updates the progress manager
         """
+        proxy_manager = None
+        spreadsheet_manager = None
+        url_manager = None
+        index_checker = None
         try:
             # pull proxies from text file
             ProgressManager.update_progress("Starting App ...")
@@ -47,6 +50,7 @@ def check():
         except Exception as e:
             print(e)
             ProgressManager.update_progress("Failed to load proxies: " + str(e), False)
+            return
 
         try:
             # pull sitemaps from the spreadsheet
@@ -64,6 +68,7 @@ def check():
             ProgressManager.update_progress(
                 "Failed to load spreadsheet: " + str(e), False
             )
+            return
 
         try:
             # run the checks
@@ -77,6 +82,7 @@ def check():
         except Exception as e:
             print(e)
             ProgressManager.update_progress("Failed to run checks: " + str(e), False)
+            return
 
         ProgressManager.update_progress("Done!", is_working=False)
 
