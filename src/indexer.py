@@ -114,7 +114,7 @@ class Indexer:
                 print("Failed!", e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
-                ProgressManager.update_progress(f"Request failed! {e.__class__.__name__}, ")
+                ProgressManager.update_progress(f"Request failed! {e.__class__.__name__} ")
                 break
         time.sleep(5)
         return requests.get(url,timeout=20)

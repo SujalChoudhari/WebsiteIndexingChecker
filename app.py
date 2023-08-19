@@ -6,6 +6,7 @@ from src.indexer import Indexer
 from src.sheet_manager import SpreadsheetManager
 from src.progress_manager import ProgressManager
 from src.constants import URL_TO_SHEETS, SERVICE_ACCOUNT_FILENAME
+import webview
 
 app = flask.Flask(__name__)
 check_lock = threading.Lock()
@@ -55,9 +56,7 @@ def check():
         try:
             # pull sitemaps from the spreadsheet
             ProgressManager.update_progress("Loading Spreadsheet ...")
-            spreadsheet_manager = SpreadsheetManager(
-                SERVICE_ACCOUNT_FILENAME, URL_TO_SHEETS
-            )
+            spreadsheet_manager = SpreadsheetManager(URL_TO_SHEETS)
 
             # get all urls from the sitemaps as a manager
             ProgressManager.update_progress("Parsing URLs (this may take a while) ...")
@@ -115,3 +114,16 @@ def done():
     return flask.render_template(
         "done.html", url_to_sheets=URL_TO_SHEETS, message=ProgressManager.done_message
     )
+
+
+if __name__ == "__main__":
+    window = webview.create_window(
+        "Index Checker",
+        app,
+        confirm_close=True,
+        min_size=(1500, 900),
+        text_select=True,
+        easy_drag=True,
+    )
+
+    webview.start()
