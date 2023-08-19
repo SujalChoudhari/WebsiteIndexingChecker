@@ -46,10 +46,10 @@ class Indexer:
                 self.url_manager.current_url_index,
                 len(self.url_manager.urls)
             ))
-
-            url, is_indexed, status = self.check_next_url()
             time.sleep(1)
-            print("URL " + url + " is indexed: " + str(is_indexed) + " Status: " + status)
+            url, is_indexed, status = self.check_next_url()
+            print("STATUS: ", status, "INDEXED: ", is_indexed, "URL: ", url[10:])
+            
             if not is_indexed and status == "checked":
                 self.sheet_manager.add_unindexed_url(url)
 
@@ -91,31 +91,30 @@ class Indexer:
     def proxy_request(self, url, **kwargs):
         fail_count = 0
         max_failures = 3  # Adjust this threshold as needed
+        print("Evaluating: ", self.proxy_manager.current_index)
         while fail_count < max_failures:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
             if current_proxy is None:
                 ProgressManager.update_progress("All given proxy failed")
                 return requests.get(url, **kwargs)
-
-            print("\n\nUsing Proxy: ", current_proxy["http"])
+            
             try:
                 response = requests.get(url, proxies=current_proxy, timeout=20,headers=REQUEST_HEADERS)
                 if response.status_code == 200:
-                    print("\tSuccess!")
+                    print("Success!")
                     self.proxy_manager.update_proxy()
                     return response
                 else:
-                    print("\tFailed!",response.status_code)
+                    print("Failed!",response.status_code)
                     ProgressManager.update_progress("Proxy failed with status code: " + str(response.status_code))
                     time.sleep(2)
                     self.proxy_manager.update_proxy()
             except Exception as e:
-                print("\tFailed!", e)
+                print("Failed!", e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
+                ProgressManager.update_progress(f"Request failed! {e.__class__.__name__}, ")
                 break
-
-        ProgressManager.update_progress(f"Request failed! {e.__class__.__name__}, ")
         time.sleep(5)
         return requests.get(url,timeout=20)
