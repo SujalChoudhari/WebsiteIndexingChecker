@@ -16,6 +16,7 @@ def index():
     """
     Homepage route
     """
+    ProgressManager.update_progress("Starting Up!")
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
 
@@ -42,13 +43,13 @@ def check():
         index_checker = None
         try:
             # pull proxies from text file
-            ProgressManager.update_progress("Starting App ...")
+            ProgressManager.update_progress("Starting App ...", True)
             proxies = []
             if proxy_file is not None:
                 proxies = proxy_file.read().decode("utf-8").split("\n")
             proxy_manager = ProxyManager(proxies)
         except Exception as e:
-            print("Proxy File Error: ",e)
+            print("Proxy File Error: ", e)
             ProgressManager.update_progress("Failed to load proxies: " + str(e), False)
             return
 
@@ -62,7 +63,7 @@ def check():
             url_manager = URLManager(spreadsheet_manager)
             url_manager.process()
         except Exception as e:
-            print("Spreadsheet Error: ",e)
+            print("Spreadsheet Error: ", e)
             ProgressManager.update_progress(
                 "Failed to load spreadsheet: " + str(e), False
             )
@@ -78,7 +79,7 @@ def check():
             # save unindexed
             spreadsheet_manager.save_unindexed_to_sheets()
         except Exception as e:
-            print("Checker Error: ",e)
+            print("Checker Error: ", e)
             ProgressManager.update_progress("Failed to run checks: " + str(e), False)
             return
 
@@ -113,4 +114,3 @@ def done():
     return flask.render_template(
         "done.html", url_to_sheets=URL_TO_SHEETS, message=ProgressManager.done_message
     )
-
