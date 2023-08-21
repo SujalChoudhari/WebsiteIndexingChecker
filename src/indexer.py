@@ -81,14 +81,14 @@ class Indexer:
         current_url = self.url_manager.get_next_url()
         if current_url is None:
             return "none", False, "end"
-        
+
         try:
             response = self.proxy_request(INDEXING_SEARCH_STRING.format(current_url))
             if response.status_code != 200:
                 return current_url, False, "failed"
 
             soup = bs4.BeautifulSoup(response.text, "html.parser")
-            soup_text = soup.find("head").get_text() if soup.find("head") else ''
+            soup_text = soup.find("head").get_text() if soup.find("head") else ""
 
             # Define language-specific regex patterns for "not indexed" message
             language_to_pattern = {
@@ -96,11 +96,10 @@ class Indexer:
                 "uk": r"не знайдено жодного документа",  # Ukrainian version of the message
             }
 
-            language_detected = None
-            for language, pattern in language_to_pattern.items():
-                if re.search(pattern, soup_text, re.IGNORECASE):
-                    language_detected = language
-                    break
+            if soup(text=re.compile(language_to_pattern["en"])) or soup(
+                text=re.compile(language_to_pattern["uk"])
+            ):
+                language_detected = True
 
             if language_detected:
                 return current_url, False, "checked"
