@@ -5,8 +5,7 @@ from src.proxy_manager import ProxyManager
 from src.indexer import Indexer
 from src.sheet_manager import SpreadsheetManager
 from src.progress_manager import ProgressManager
-from src.constants import URL_TO_SHEETS, SERVICE_ACCOUNT_FILENAME
-import webview
+from src.constants import URL_TO_SHEETS
 
 app = flask.Flask(__name__)
 check_lock = threading.Lock()
@@ -49,7 +48,7 @@ def check():
                 proxies = proxy_file.read().decode("utf-8").split("\n")
             proxy_manager = ProxyManager(proxies)
         except Exception as e:
-            print(e)
+            print("Proxy File Error: ",e)
             ProgressManager.update_progress("Failed to load proxies: " + str(e), False)
             return
 
@@ -63,7 +62,7 @@ def check():
             url_manager = URLManager(spreadsheet_manager)
             url_manager.process()
         except Exception as e:
-            print(e)
+            print("Spreadsheet Error: ",e)
             ProgressManager.update_progress(
                 "Failed to load spreadsheet: " + str(e), False
             )
@@ -79,7 +78,7 @@ def check():
             # save unindexed
             spreadsheet_manager.save_unindexed_to_sheets()
         except Exception as e:
-            print(e)
+            print("Checker Error: ",e)
             ProgressManager.update_progress("Failed to run checks: " + str(e), False)
             return
 
@@ -115,15 +114,3 @@ def done():
         "done.html", url_to_sheets=URL_TO_SHEETS, message=ProgressManager.done_message
     )
 
-
-if __name__ == "__main__":
-    window = webview.create_window(
-        "Index Checker",
-        app,
-        confirm_close=True,
-        min_size=(1500, 900),
-        text_select=True,
-        easy_drag=True,
-    )
-
-    webview.start()

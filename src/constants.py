@@ -1,5 +1,3 @@
-import os
-
 URL_TO_SHEETS = "https://docs.google.com/spreadsheets/d/1up6bYQj2X5XoYfS9aN8zAT5oz8dFQIGZlXCr_Madgug/edit#gid=1700410190"
 INDEXING_SEARCH_STRING = "https://www.google.com/search?q=site:{}&num=1"
 REQUEST_HEADERS = {

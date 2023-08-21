@@ -1,6 +1,6 @@
 import numpy as np
 import gspread
-from src.constants import URL_TO_SHEETS,SERVICE_ACCOUNT
+from src.constants import URL_TO_SHEETS
 
 
 class SpreadsheetManager:
@@ -21,7 +21,7 @@ class SpreadsheetManager:
 
     """
     def __init__(self, url_to_sheet: str):
-        self.gc = gspread.service_account_from_dict(SERVICE_ACCOUNT)
+        self.gc = gspread.service_account("service_account.json")
         self.spreadsheet = self.gc.open_by_url(url_to_sheet)
         self.unindexed_urls = []
         self.sitemap_sheet = None
