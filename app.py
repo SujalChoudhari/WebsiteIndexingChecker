@@ -16,7 +16,7 @@ def index():
     """
     Homepage route
     """
-    ProgressManager.update_progress("Starting Up!")
+    ProgressManager.update_progress("Working ...")
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
 
@@ -78,6 +78,7 @@ def check():
 
             # save unindexed
             spreadsheet_manager.save_unindexed_to_sheets()
+            
         except Exception as e:
             print("Checker Error: ", e)
             ProgressManager.update_progress("Failed to run checks: " + str(e), False)
