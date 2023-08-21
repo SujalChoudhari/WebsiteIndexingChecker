@@ -82,6 +82,7 @@ class Indexer:
             if soup(text=not_indexed_regex):
                 return current_url, False, "checked"
             else:
+                print(response.text)
                 return current_url, True, "checked"
             
         except Exception as e:

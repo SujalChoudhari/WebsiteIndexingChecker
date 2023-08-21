@@ -36,7 +36,7 @@ class ProxyManager:
         if len(p) < 4:
             return None
         proxy = p[2] + ":" + p[3] + "@" + p[0] + ":" + p[1]
-        return {"http": "http://" + proxy, "https": "http://" + proxy}
+        return {"http": "http://" + proxy, "https": "https://" + proxy}
 
     def update_proxy(self):
         proxy_index = 0
