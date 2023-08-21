@@ -59,7 +59,6 @@ class Indexer:
                 fail_count = 0
             elif status == "failed":
                 fail_count += 1
-
             
             if fail_count > 5:
                 ProgressManager.update_progress("Failed consistently more than 5 times! Exiting Process...")
@@ -83,7 +82,6 @@ class Indexer:
             if soup(text=not_indexed_regex):
                 return current_url, False, "checked"
             else:
-                print(response.text)
                 return current_url, True, "checked"
             
         except Exception as e:

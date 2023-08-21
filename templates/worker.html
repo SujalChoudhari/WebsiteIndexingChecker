@@ -29,7 +29,7 @@
 
     <script>
         setInterval(async () => {
-            const res = await fetch("http://" + document.domain + ":" + location.port + "/api");
+            const res = await fetch("https://" + document.domain + ":" + location.port + "/api");
             const text = await res.text();
             const text_as_json = JSON.parse(text);
             if (text_as_json["is_working"] == "False") {
