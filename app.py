@@ -86,8 +86,7 @@ def check():
             return
 
         ProgressManager.update_progress("Done!", is_working=False)
-        time.sleep(3)
-        ProgressManager.done_message = "Process completed!"
+        time.sleep(6)
         ProgressManager.update_progress("Working ...")
 
     if check_lock.acquire(blocking=False):  # Attempt to acquire the lock
