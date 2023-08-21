@@ -19,7 +19,7 @@ class URLManager:
     def __init__(self, sheet_manager: SpreadsheetManager):
         self.sitemaps = np.array(sheet_manager.get_sitemaps())
         self.urls = np.array([])
-        self.current_url_index = 0
+        self.current_url_index = -1
 
     def process(self):
         for sitemap in self.sitemaps:

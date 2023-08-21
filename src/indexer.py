@@ -7,7 +7,8 @@ from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
 from src.progress_manager import ProgressManager
-from src.constants import INDEXING_SEARCH_STRING,REQUEST_HEADERS
+from src.constants import INDEXING_SEARCH_STRING, REQUEST_HEADERS
+
 
 class Indexer:
     """
@@ -27,6 +28,7 @@ class Indexer:
         - If the proxy manager runs out of proxies, mark the url as failed in the url manager
         - If more than 5 urls fail in a row, stop the process, exit
     """
+
     def __init__(
         self,
         proxy_manager: ProxyManager,
@@ -42,14 +44,16 @@ class Indexer:
     def process(self):
         fail_count = 0
         while self.url_manager.has_more_urls():
-            ProgressManager.update_progress("Progress: {}/{}".format(
-                self.url_manager.current_url_index,
-                len(self.url_manager.urls)
-            ))
+            ProgressManager.update_progress(
+                "Progress: {}/{}".format(
+                    max(self.url_manager.current_url_index, 0),
+                    len(self.url_manager.urls),
+                )
+            )
             time.sleep(1)
             url, is_indexed, status = self.check_next_url()
             print("STATUS: ", status, "INDEXED: ", is_indexed, "URL: ", url[10:])
-            
+
             if not is_indexed and status == "checked":
                 self.sheet_manager.add_unindexed_url(url)
 
@@ -59,12 +63,16 @@ class Indexer:
                 fail_count = 0
             elif status == "failed":
                 fail_count += 1
-            
+
             if fail_count > 5:
-                ProgressManager.update_progress("Failed consistently more than 5 times! Exiting Process...")
-                ProgressManager.done_message = "Failed consistently 5 times! Exiting Process..."
+                ProgressManager.update_progress(
+                    "Failed consistently more than 5 times! Exiting Process..."
+                )
+                ProgressManager.done_message = (
+                    "Failed consistently 5 times! Exiting Process..."
+                )
                 return
-            
+
             if self.url_manager.current_url_index % 50 == 0:
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")
                 self.sheet_manager.save_unindexed_to_sheets()
@@ -82,8 +90,9 @@ class Indexer:
             if soup(text=not_indexed_regex):
                 return current_url, False, "checked"
             else:
+                print(soup.find("head").text)
                 return current_url, True, "checked"
-            
+
         except Exception as e:
             print("Error: ", e)
             return current_url, False, "failed"
@@ -98,23 +107,29 @@ class Indexer:
             if current_proxy is None:
                 ProgressManager.update_progress("All given proxy failed")
                 return requests.get(url, **kwargs)
-            
+
             try:
-                response = requests.get(url, proxies=current_proxy, timeout=20,headers=REQUEST_HEADERS)
+                response = requests.get(
+                    url, proxies=current_proxy, timeout=20, headers=REQUEST_HEADERS
+                )
                 if response.status_code == 200:
                     print("Success!")
                     self.proxy_manager.update_proxy()
                     return response
                 else:
-                    print("Failed!",response.status_code)
-                    ProgressManager.update_progress("Proxy failing with status code: " + str(response.status_code))
+                    print("Failed!", response.status_code)
+                    ProgressManager.update_progress(
+                        "Proxy failing with status code: " + str(response.status_code)
+                    )
                     time.sleep(0.5)
                     self.proxy_manager.update_proxy()
             except Exception as e:
                 print("Failed!", e)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
-                ProgressManager.update_progress(f"Request failed! {e.__class__.__name__}. ")
+                ProgressManager.update_progress(
+                    f"Request failed! {e.__class__.__name__}. "
+                )
                 break
         time.sleep(5)
-        return requests.get(url,timeout=20,headers=REQUEST_HEADERS)
+        return requests.get(url, timeout=20, headers=REQUEST_HEADERS)
