@@ -1,5 +1,6 @@
 import flask
 import threading
+import time
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
 from src.indexer import Indexer
@@ -78,13 +79,16 @@ def check():
 
             # save unindexed
             spreadsheet_manager.save_unindexed_to_sheets()
-            
+
         except Exception as e:
             print("Checker Error: ", e)
             ProgressManager.update_progress("Failed to run checks: " + str(e), False)
             return
 
         ProgressManager.update_progress("Done!", is_working=False)
+        time.sleep(3)
+        ProgressManager.done_message = "Process completed!"
+        ProgressManager.update_progress("Working ...")
 
     if check_lock.acquire(blocking=False):  # Attempt to acquire the lock
         try:
