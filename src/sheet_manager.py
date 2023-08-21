@@ -1,6 +1,6 @@
 import numpy as np
 import gspread
-from src.constants import URL_TO_SHEETS
+from src.constants import URL_TO_SHEETS,SERVICE_ACCOUNT
 
 
 class SpreadsheetManager:
@@ -20,8 +20,8 @@ class SpreadsheetManager:
         - The spreadsheet is updated in realtime, so you can watch the progress of the script by opening the spreadsheet.
 
     """
-    def __init__(self, filename: str, url_to_sheet: str):
-        self.gc = gspread.service_account(filename=filename)
+    def __init__(self, url_to_sheet: str):
+        self.gc = gspread.service_account_from_dict(SERVICE_ACCOUNT)
         self.spreadsheet = self.gc.open_by_url(url_to_sheet)
         self.unindexed_urls = []
         self.sitemap_sheet = None
