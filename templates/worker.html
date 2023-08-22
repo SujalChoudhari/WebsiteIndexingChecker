@@ -43,6 +43,7 @@
                 document.getElementsByClassName("progress-filler")[0].style.width = width_in_percent + "%";
             }
             document.getElementById("progress").innerHTML = text_as_json["progress"];
+            document.head.getElementsByTagName("title")[0].innerHTML = text_as_json["progress"] + " | Google Index Checker";
         }, 2000)
     </script>
 </body>
