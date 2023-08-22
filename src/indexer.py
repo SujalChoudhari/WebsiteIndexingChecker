@@ -66,16 +66,20 @@ class Indexer:
 
             if fail_count > 5:
                 ProgressManager.update_progress(
-                    "Failed consistently more than 5 times! Exiting Process..."
+                    "Failed consistently 5 times! Exiting Process..."
                 )
                 ProgressManager.done_message = (
                     "Failed consistently 5 times! Exiting Process..."
                 )
-                return
+                return False
 
-            if self.url_manager.current_url_index % 50 == 0 and self.url_manager.current_url_index != 0:
+            if (
+                self.url_manager.current_url_index % 50 == 0
+                and self.url_manager.current_url_index != 0
+            ):
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")
                 self.sheet_manager.save_unindexed_to_sheets()
+        return True
 
     def check_next_url(self):
         current_url = self.url_manager.get_next_url()
@@ -107,7 +111,6 @@ class Indexer:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
             if current_proxy is None:
-                ProgressManager.update_progress("All given proxy failed")
                 return requests.get(url, **kwargs)
 
             try:

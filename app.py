@@ -11,12 +11,16 @@ from src.constants import URL_TO_SHEETS
 app = flask.Flask(__name__)
 check_lock = threading.Lock()
 
+HAS_ERROR = False
+ERROR = None
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     """
     Homepage route
     """
+    global HAS_ERROR
+    HAS_ERROR = False
     ProgressManager.update_progress("Working ...")
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
@@ -33,6 +37,7 @@ def check():
         proxy_file = flask.request.files["proxy-file"]
 
     def checker(proxy_file):
+        global HAS_ERROR, ERROR
         """
         Main Runner function called when user presses `Start` button.
         This organizes the flow of the program
@@ -52,6 +57,8 @@ def check():
         except Exception as e:
             print("Proxy File Error: ", e)
             ProgressManager.update_progress("Failed to load proxies: " + str(e), False)
+            HAS_ERROR = True
+            ERROR = "Failed to load proxies: " + str(e)
             return
 
         try:
@@ -68,26 +75,37 @@ def check():
             ProgressManager.update_progress(
                 "Failed to load spreadsheet: " + str(e), False
             )
+            HAS_ERROR = True
+            ERROR = "Failed to load spreadsheet: " + str(e)
             return
 
         try:
             # run the checks
             ProgressManager.update_progress("Checking URLs ...")
             index_checker = Indexer(proxy_manager, url_manager, spreadsheet_manager)
-            index_checker.process()
-            ProgressManager.update_progress("Checks Complete")
+            done_status = index_checker.process()
+            if not done_status:
+                HAS_ERROR = True
+                ERROR = "Failed to run checks: failed multiple times"
+            else:
+                HAS_ERROR = False
+                ERROR = None
 
+            ProgressManager.update_progress("Checks Complete")
             # save unindexed
             spreadsheet_manager.save_unindexed_to_sheets()
+            ProgressManager.is_working = "False"
 
         except Exception as e:
             print("Checker Error: ", e)
+            HAS_ERROR = True
+            ERROR = "Failed to run checks: " + str(e)
             ProgressManager.update_progress("Failed to run checks: " + str(e), False)
             return
 
-        ProgressManager.update_progress("Done!", is_working=False)
+        ProgressManager.is_working = "False"
         time.sleep(6)
-        ProgressManager.update_progress("Working ...")
+        ProgressManager.is_working = "True"
 
     if check_lock.acquire(blocking=False):  # Attempt to acquire the lock
         try:
@@ -115,6 +133,12 @@ def return_data():
 
 @app.route("/done")
 def done():
+    if HAS_ERROR:
+        return flask.render_template(
+            "error.html",
+            url_to_sheets=URL_TO_SHEETS,
+            message="There was some errors while running:" if ERROR is None else ERROR,
+        )
     return flask.render_template(
         "done.html", url_to_sheets=URL_TO_SHEETS, message=ProgressManager.done_message
     )
