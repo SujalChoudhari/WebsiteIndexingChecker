@@ -73,7 +73,7 @@ class Indexer:
                 )
                 return
 
-            if self.url_manager.current_url_index % 50 == 0:
+            if self.url_manager.current_url_index % 50 == 0 and self.url_manager.current_url_index != 0:
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")
                 self.sheet_manager.save_unindexed_to_sheets()
 
@@ -88,20 +88,9 @@ class Indexer:
                 return current_url, False, "failed"
 
             soup = bs4.BeautifulSoup(response.text, "html.parser")
-            soup_text = soup.find("head").get_text() if soup.find("head") else ""
 
-            # Define language-specific regex patterns for "not indexed" message
-            language_to_pattern = {
-                "en": r"did not match any documents",
-                "uk": r"не знайдено жодного документа",  # Ukrainian version of the message
-            }
-
-            if soup(text=re.compile(language_to_pattern["en"])) or soup(
-                text=re.compile(language_to_pattern["uk"])
-            ):
-                language_detected = True
-
-            if language_detected:
+            not_indexed_filter = re.compile(r"did not match any documents")
+            if soup(text=not_indexed_filter):
                 return current_url, False, "checked"
             else:
                 return current_url, True, "checked"
