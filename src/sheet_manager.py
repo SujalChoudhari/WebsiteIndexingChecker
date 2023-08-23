@@ -36,7 +36,7 @@ class SpreadsheetManager:
                 self.unindexed_sheet = sheet
 
         if self.sitemap_sheet == None:
-            self.sitemap_sheet = self.spreadsheet.add_worksheet("Sitemaps", 100, 1)
+            self.sitemap_sheet = self.spreadsheet.add_worksheet("Sitemaps", 100, 2)
 
         if self.unindexed_sheet == None:
             self.unindexed_sheet = self.spreadsheet.add_worksheet("Unindexed", 100, 1)
@@ -45,7 +45,7 @@ class SpreadsheetManager:
         self.unindexed_urls.append(urls)
 
     def get_sitemaps(self) -> list[str]:
-        sitemaps = np.array(self.sitemap_sheet.get_values()).flatten()
+        sitemaps = np.array(self.sitemap_sheet.col_values(1)).flatten()
         return sitemaps.tolist()
 
     def save_unindexed_to_sheets(self):
