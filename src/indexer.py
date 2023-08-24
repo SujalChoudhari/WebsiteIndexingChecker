@@ -24,8 +24,6 @@ class Indexer:
             - use regex to find the indexing string
         - If the url is indexed, mark it as indexed in the url manager
         - If the url is not indexed, mark it as not indexed in the url manager
-        - If a proxy fails, mark it as failed in the proxy manager
-        - If the proxy manager runs out of proxies, mark the url as failed in the url manager
         - If more than 5 urls fail in a row, stop the process, exit
     """
 
@@ -137,4 +135,6 @@ class Indexer:
                 )
                 break
         time.sleep(5)
-        return requests.get(url, timeout=20, headers=REQUEST_HEADERS)
+        final_response = requests.get(url, timeout=20, headers=REQUEST_HEADERS)
+
+        return final_response

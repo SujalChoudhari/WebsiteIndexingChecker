@@ -7,16 +7,6 @@ class ProxyManager:
         It has a record of which proxies are used, and which are not.
         When imported, it shuffles the proxies, and returns a proxy one by one to the indexer.
         Everytime the the list of unused proxies is empty, it shuffles the list again.
-        
-        ### Failed Proxies
-        It also has a record of which proxies failed, and which are not.
-        If a proxy is failed then it is not used again, saving time.
-
-        ### Using Proxies
-        It will shuffle all the proxies check which proxies are working and which are not.
-        If a proxy is working, it will be used for the next request, untill it fails. i.e. 20-25 requests.
-        A failed proxy will not be used again.
-
     """
     def __init__(self, proxies: list):
         self.proxies = np.array(proxies)

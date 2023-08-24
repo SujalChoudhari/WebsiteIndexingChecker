@@ -51,7 +51,6 @@ class SpreadsheetManager:
     def save_unindexed_to_sheets(self):
         self.update_unindexed_sheet_with(self.unindexed_urls)
 
-
     def update_unindexed_sheet_with(self, list_of_urls: list):
         if(len(list_of_urls) == 0):
             return
