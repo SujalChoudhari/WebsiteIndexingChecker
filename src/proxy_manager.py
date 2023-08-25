@@ -11,13 +11,13 @@ class ProxyManager:
     def __init__(self, proxies: list):
         self.proxies = np.array(proxies)
         self.available_proxies_index = np.arange(len(self.proxies))
+        self.shuffle_proxies()
         self.current_index = 0
         self.current_proxy = None
         self.update_proxy()
 
     def shuffle_proxies(self) -> None:
-        self.working_proxies = np.unique(self.working_proxies)
-        np.random.shuffle(self.working_proxies)
+        np.random.shuffle(self.available_proxies_index)
 
     def get_proxy_for_request(self):
         if self.current_proxy is None:
@@ -41,12 +41,11 @@ class ProxyManager:
 
 
     def reset_chain(self):
-        self.shuffle_proxies()
         self.available_proxies_index = np.arange(len(self.proxies))
+        self.shuffle_proxies()
         
     def get_proxy_list(self):
         return self.proxies.tolist()
 
     def get_remaining_proxies_amount(self):
         return len(self.proxies)
-

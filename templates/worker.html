@@ -29,6 +29,7 @@
     </div>
 
     <script>
+        const consecutive_working_count = 0
         setInterval(async () => {
             const res = await fetch("https://" + document.domain + ":" + location.port + "/api");
             const text = await res.text();
@@ -43,6 +44,17 @@
                 let width_in_percent = (lower_limit / upper_limit) * 100;
                 document.getElementsByClassName("progress-filler")[0].style.width = width_in_percent + "%";
             }
+
+            if (text_as_json["progress"].startsWith("Working")) {
+                consecutive_working_count++;
+            } else {
+                consecutive_working_count = 0;
+            }
+
+            if(consecutive_working_count > 10){
+                window.location.href = "./done"
+            }
+
             document.getElementById("progress").innerHTML = text_as_json["progress"];
             document.head.getElementsByTagName("title")[0].innerHTML = text_as_json["progress"] + " | Google Index Checker";
         }, 2000)
