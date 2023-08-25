@@ -29,7 +29,7 @@
     </div>
 
     <script>
-        const consecutive_working_count = 0
+        var consecutive_working_count = 0
         setInterval(async () => {
             const res = await fetch("https://" + document.domain + ":" + location.port + "/api");
             const text = await res.text();
