@@ -1,6 +1,6 @@
-import flask
 import threading
 import time
+import flask
 from src.url_manager import URLManager
 from src.proxy_manager import ProxyManager
 from src.indexer import Indexer
@@ -37,12 +37,12 @@ def check():
         proxy_file = flask.request.files["proxy-file"]
 
     def checker(proxy_file):
-        global HAS_ERROR, ERROR
         """
         Main Runner function called when user presses `Start` button.
         This organizes the flow of the program
         Checks for any errors and updates the progress manager
         """
+        global HAS_ERROR, ERROR
         proxy_manager = None
         spreadsheet_manager = None
         url_manager = None
@@ -54,11 +54,11 @@ def check():
             if proxy_file is not None:
                 proxies = proxy_file.read().decode("utf-8").split("\n")
             proxy_manager = ProxyManager(proxies)
-        except Exception as e:
-            print("Proxy File Error: ", e)
-            ProgressManager.update_progress("Failed to load proxies: " + str(e), False)
+        except Exception as exception:
+            print("Proxy File Error: ", exception)
+            ProgressManager.update_progress("Failed to load proxies: " + str(exception), False)
             HAS_ERROR = True
-            ERROR = "Failed to load proxies: " + str(e)
+            ERROR = "Failed to load proxies: " + str(exception)
             return
 
         try:
@@ -70,13 +70,13 @@ def check():
             ProgressManager.update_progress("Parsing URLs (this may take a while) ...")
             url_manager = URLManager(spreadsheet_manager)
             url_manager.process()
-        except Exception as e:
-            print("Spreadsheet Error: ", e)
+        except Exception as exception:
+            print("Spreadsheet Error: ", exception)
             ProgressManager.update_progress(
-                "Failed to load spreadsheet: " + str(e), False
+                "Failed to load spreadsheet: " + str(exception), False
             )
             HAS_ERROR = True
-            ERROR = "Failed to load spreadsheet: " + str(e)
+            ERROR = "Failed to load spreadsheet: " + str(exception)
             return
 
         try:
@@ -93,14 +93,14 @@ def check():
 
             ProgressManager.update_progress("Checks Complete")
             # save unindexed
-            spreadsheet_manager.save_unindexed_to_sheets()
+            spreadsheet_manager.save_unindexed_to_sheets("Checks Completed")
             ProgressManager.is_working = "False"
 
-        except Exception as e:
-            print("Checker Error: ", e)
+        except Exception as exception:
+            print("Checker Error: ", exception)
             HAS_ERROR = True
-            ERROR = "Failed to run checks: " + str(e)
-            ProgressManager.update_progress("Failed to run checks: " + str(e), False)
+            ERROR = "Failed to run checks: " + str(exception)
+            ProgressManager.update_progress("Failed to run checks: " + str(exception), False)
             return
 
         ProgressManager.is_working = "False"

@@ -1,3 +1,7 @@
+"""
+URLManager
+"""
+
 import requests
 import bs4
 import numpy as np
@@ -22,11 +26,17 @@ class URLManager:
         self.current_url_index = -1
 
     def process(self):
+        """
+        Generate an np.array of all urls
+        """
         for sitemap in self.sitemaps:
             self.urls = np.append(self.urls, self.get_url_from_xml(sitemap))
         self.urls = np.unique(self.urls)
 
     def get_url_from_xml(self, xml_url):
+        """
+        Extract Urls from given sitemap list
+        """
         if not xml_url.endswith(".xml"):
             return [xml_url]
         res = requests.get(xml_url)
@@ -40,9 +50,15 @@ class URLManager:
         return result_urls
 
     def has_more_urls(self):
+        """
+        Returns `True` if there are more urls to be tested
+        """
         return self.current_url_index < len(self.urls)
 
     def get_next_url(self):
+        """
+        Returns next url for testing
+        """
         if self.current_url_index + 1 < len(self.urls):
             self.current_url_index += 1
             return self.urls[self.current_url_index]

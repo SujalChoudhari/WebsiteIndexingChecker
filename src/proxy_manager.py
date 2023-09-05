@@ -1,3 +1,7 @@
+"""
+ProxyManager
+"""
+
 import numpy as np
 
 class ProxyManager:

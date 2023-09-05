@@ -1,7 +1,11 @@
+"""
+Indexer Class
+"""
+
 import re
+import time
 import requests
 import bs4
-import time
 import numpy as np
 from src.sheet_manager import SpreadsheetManager
 from src.url_manager import URLManager
@@ -38,15 +42,16 @@ class Indexer:
         self.proxy_manager = proxy_manager
         self.unindexed_urls = np.array([])
         self.current_proxy = None
+        self.count_data = self.sheet_manager.get_count_sheet_as_dict()
 
     def process(self):
+        """
+        Main Processing of all links given under sitemaps
+        """
         fail_count = 0
         while self.url_manager.has_more_urls():
             ProgressManager.update_progress(
-                "Progress: {}/{}".format(
-                    max(self.url_manager.current_url_index, 0),
-                    len(self.url_manager.urls),
-                )
+                f"Progress: {self.url_manager.current_url_index +1}/{len(self.url_manager.urls)}"
             )
             time.sleep(1)
             url, is_indexed, status = self.check_next_url()
@@ -81,10 +86,16 @@ class Indexer:
                 self.sheet_manager.save_unindexed_to_sheets(
                     f"{self.url_manager.current_url_index+1}/{len(self.url_manager.urls)} completed"
                 )
+                time.sleep(1)
+                self.sheet_manager.save_count_data_dict_to_sheet(self.count_data)
 
+        self.sheet_manager.save_count_data_dict_to_sheet(self.count_data)
         return True
 
     def check_next_url(self):
+        """
+        Check next index for indexing status
+        """
         current_url = self.url_manager.get_next_url()
         if current_url is None:
             return "none", False, "end"
@@ -98,15 +109,35 @@ class Indexer:
 
             not_indexed_filter = re.compile(r"did not match any documents")
             if soup(text=not_indexed_filter):
-                return current_url, False, "checked"
-            else:
-                return current_url, True, "checked"
+                if current_url in self.count_data:  # if there is an entry with curr url
+                    if (
+                        self.count_data[current_url]["status"] == "Indexed"
+                    ):  # if it is Indexed, mark it unindexed and add 1
+                        self.count_data[current_url]["status"] = "Unindexed"
+                        self.count_data[current_url]["count"] += 1
+                else:
+                    self.count_data[current_url] = {
+                        "status": "Unindexed",
+                        "count": 1,
+                    }  # else add it to db
 
-        except Exception as e:
-            print("Error: ", e)
+                return current_url, False, "checked"
+
+            if (
+                current_url in self.count_data
+                and self.count_data[current_url]["status"] == "Unindexed"
+            ):
+                self.count_data[current_url]["status"] = "Indexed"
+            return current_url, True, "checked"
+
+        except Exception as exception:
+            print("Error: ", exception)
             return current_url, False, "failed"
 
     def proxy_request(self, url, **kwargs):
+        """
+        Modified requests for mass useage of proxies
+        """
         fail_count = 0
         success_count = 0
         max_failures = 3  # Adjust this threshold as needed
@@ -115,7 +146,7 @@ class Indexer:
             current_proxy = self.proxy_manager.get_proxy_for_request()
 
             if current_proxy is None:
-                return requests.get(url, **kwargs)
+                return requests.get(url, timeout=8, **kwargs)
 
             try:
                 response = requests.get(
@@ -135,12 +166,12 @@ class Indexer:
                     )
                     time.sleep(0.5)
                     self.proxy_manager.update_proxy()
-            except Exception as e:
-                print("Failed!", e)
+            except Exception as exception:
+                print("Failed!", exception)
                 fail_count += 1
                 self.proxy_manager.update_proxy()
                 ProgressManager.update_progress(
-                    f"Request failed! {e.__class__.__name__}. Retrying..."
+                    f"Request failed! {exception.__class__.__name__}. Retrying..."
                 )
                 break
         time.sleep(5)
