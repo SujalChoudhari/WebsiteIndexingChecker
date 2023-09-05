@@ -78,7 +78,7 @@ class Indexer:
                 return False
 
             if (
-                self.url_manager.current_url_index % 5 == 0
+                self.url_manager.current_url_index % 7 == 0
                 and self.url_manager.current_url_index != 0
             ):
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")

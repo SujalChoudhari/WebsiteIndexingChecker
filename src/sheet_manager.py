@@ -96,7 +96,11 @@ class SpreadsheetManager:
         headers = ['Link', 'Current Status', 'Count']
         self.unindexed_count_sheet.append_row(headers)
 
-        # Write the data from the dictionary to the sheet
+        # Create a 2D array to hold the data
+        rows = []
         for link, info in data_dict.items():
             row_data = [link, info['status'], info['count']]
-            self.unindexed_count_sheet.append_row(row_data)
+            rows.append(row_data)
+
+        # Use append_rows to add all rows in a single API call
+        self.unindexed_count_sheet.append_rows(rows)
