@@ -59,6 +59,7 @@ class Indexer:
                 break
             elif status == "checked":
                 fail_count = 0
+
             elif status == "failed":
                 fail_count += 1
 
@@ -72,11 +73,15 @@ class Indexer:
                 return False
 
             if (
-                self.url_manager.current_url_index % 50 == 0
+                self.url_manager.current_url_index % 5 == 0
                 and self.url_manager.current_url_index != 0
             ):
                 ProgressManager.update_progress("Saving unindexed urls to sheets...")
-                self.sheet_manager.save_unindexed_to_sheets()
+
+                self.sheet_manager.save_unindexed_to_sheets(
+                    f"{self.url_manager.current_url_index+1}/{len(self.url_manager.urls)} completed"
+                )
+
         return True
 
     def check_next_url(self):
@@ -103,6 +108,7 @@ class Indexer:
 
     def proxy_request(self, url, **kwargs):
         fail_count = 0
+        success_count = 0
         max_failures = 3  # Adjust this threshold as needed
         print("Evaluating: ", self.url_manager.current_url_index, "URL: ", url)
         while fail_count < max_failures:
@@ -117,7 +123,10 @@ class Indexer:
                 )
                 if response.status_code == 200:
                     print("Success!")
-                    self.proxy_manager.update_proxy()
+                    success_count += 1
+                    if success_count >= 5:
+                        success_count = 0
+                        self.proxy_manager.update_proxy()
                     return response
                 else:
                     print("Failed!", response.status_code)

@@ -48,10 +48,10 @@ class SpreadsheetManager:
         sitemaps = np.array(self.sitemap_sheet.col_values(1)).flatten()
         return sitemaps.tolist()
 
-    def save_unindexed_to_sheets(self):
-        self.update_unindexed_sheet_with(self.unindexed_urls)
+    def save_unindexed_to_sheets(self,status:str):
+        self.update_unindexed_sheet_with(self.unindexed_urls,status)
 
-    def update_unindexed_sheet_with(self, list_of_urls: list):
+    def update_unindexed_sheet_with(self, list_of_urls:list,status:[str]):
         if(len(list_of_urls) == 0):
             return
         self.unindexed_sheet.clear()  # Clear the existing content
@@ -59,6 +59,7 @@ class SpreadsheetManager:
         # Convert the list of URLs into a two-dimensional list using numpy
         urls_2d = np.array(list_of_urls).reshape(-1, 1).tolist()
         self.unindexed_sheet.append_rows(urls_2d)
+        self.unindexed_sheet.append_row([status])
 
 
 if __name__ == "__main__":
