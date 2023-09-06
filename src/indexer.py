@@ -49,11 +49,11 @@ class Indexer:
         Main Processing of all links given under sitemaps
         """
         fail_count = 0
+        success_count = 0
         while self.url_manager.has_more_urls():
             ProgressManager.update_progress(
                 f"Progress: {self.url_manager.current_url_index +1}/{len(self.url_manager.urls)}"
             )
-            time.sleep(1)
             url, is_indexed, status = self.check_next_url()
             print("STATUS: ", status, "INDEXED: ", is_indexed, "URL: ", url[10:])
 
@@ -62,11 +62,18 @@ class Indexer:
 
             if status == "end":
                 break
-            elif status == "checked":
+            
+            if status == "checked":
+                success_count +=1
+                time.sleep(1)
+                if success_count > 10:
+                    success_count = 0
+                    self.proxy_manager.update_proxy()
                 fail_count = 0
 
             elif status == "failed":
                 fail_count += 1
+                success_count = 0
 
             if fail_count > 5:
                 ProgressManager.update_progress(
@@ -139,7 +146,6 @@ class Indexer:
         Modified requests for mass useage of proxies
         """
         fail_count = 0
-        success_count = 0
         max_failures = 3  # Adjust this threshold as needed
         print("Evaluating: ", self.url_manager.current_url_index, "URL: ", url)
         while fail_count < max_failures:
@@ -154,10 +160,6 @@ class Indexer:
                 )
                 if response.status_code == 200:
                     print("Success!")
-                    success_count += 1
-                    if success_count >= 5:
-                        success_count = 0
-                        self.proxy_manager.update_proxy()
                     return response
                 else:
                     print("Failed!", response.status_code)
