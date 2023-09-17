@@ -101,6 +101,7 @@ def check():
             HAS_ERROR = True
             ERROR = "Failed to run checks: " + str(exception)
             ProgressManager.update_progress("Failed to run checks: " + str(exception), False)
+            spreadsheet_manager.save_unindexed_to_sheets("Failed to run checks: " + str(exception))
             return
 
         ProgressManager.is_working = "False"
@@ -111,7 +112,7 @@ def check():
         try:
             check_thread = threading.Thread(target=checker, args=(proxy_file,))
             check_thread.start()
-            return flask.render_template("worker.html", url_to_sheets=URL_TO_SHEETS)
+            return flask.render_template("done.html", url_to_sheets=URL_TO_SHEETS, message="The process is running, check the sheets for status")
         finally:
             check_lock.release()  # Release the lock after thread execution
     else:
@@ -120,15 +121,6 @@ def check():
             503,
         )  # Service Unavailable
 
-
-@app.route("/api", methods=["GET", "POST"])
-def return_data():
-    """
-    Api for realtime updates for user, this is called by the frontend
-    """
-    return flask.jsonify(
-        progress=ProgressManager.progress, is_working=ProgressManager.is_working
-    )
 
 
 @app.route("/done")
@@ -140,5 +132,5 @@ def done():
             message="There was some errors while running:" if ERROR is None else ERROR,
         )
     return flask.render_template(
-        "done.html", url_to_sheets=URL_TO_SHEETS, message=ProgressManager.done_message
+        "done.html", url_to_sheets=URL_TO_SHEETS, message="The process is running, check the sheets for status"
     )

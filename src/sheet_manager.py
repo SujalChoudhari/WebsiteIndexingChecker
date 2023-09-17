@@ -60,13 +60,14 @@ class SpreadsheetManager:
         self.update_unindexed_sheet_with(self.unindexed_urls, status)
 
     def update_unindexed_sheet_with(self, list_of_urls: list, status: [str]):
-        if len(list_of_urls) == 0:
-            return
+        
         self.unindexed_sheet.clear()  # Clear the existing content
         print("Updating unindexed sheet with:", list_of_urls)
         # Convert the list of URLs into a two-dimensional list using numpy
-        urls_2d = np.array(list_of_urls).reshape(-1, 1).tolist()
         self.unindexed_sheet.append_row([status])
+        if len(list_of_urls) == 0:
+            return
+        urls_2d = np.array(list_of_urls).reshape(-1, 1).tolist()
         self.unindexed_sheet.append_rows(urls_2d)
 
     def get_count_sheet_as_dict(self) -> dict:
