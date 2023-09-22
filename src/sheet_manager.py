@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import gspread
 from src.constants import URL_TO_SHEETS
@@ -70,7 +71,8 @@ class SpreadsheetManager:
         self.unindexed_sheet.clear()  # Clear the existing content
         print("Updating unindexed sheet with:", list_of_urls)
         # Convert the list of URLs into a two-dimensional list using numpy
-        self.unindexed_sheet.append_row([status])
+        date = datetime.datetime.now()
+        self.unindexed_sheet.append_row([status, date.strftime("%x - %X")])
         if len(list_of_urls) == 0:
             return
         urls_2d = np.array(list_of_urls).reshape(-1, 1).tolist()
