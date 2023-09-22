@@ -1,4 +1,5 @@
 import datetime
+import zoneinfo
 import numpy as np
 import gspread
 from src.constants import URL_TO_SHEETS
@@ -71,7 +72,7 @@ class SpreadsheetManager:
         self.unindexed_sheet.clear()  # Clear the existing content
         print("Updating unindexed sheet with:", list_of_urls)
         # Convert the list of URLs into a two-dimensional list using numpy
-        date = datetime.datetime.now()
+        date = datetime.datetime.now(tz=zoneinfo.ZoneInfo('Asia/Kolkata'))
         self.unindexed_sheet.append_row([status +" ("+ date.strftime("%x - %X") + ")"])
         if len(list_of_urls) == 0:
             return
