@@ -65,7 +65,6 @@ class Indexer:
             
             if status == "checked":
                 success_count +=1
-                time.sleep(1)
                 if success_count > 10:
                     success_count = 0
                     self.proxy_manager.update_proxy()

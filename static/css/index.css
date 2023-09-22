@@ -106,7 +106,6 @@ form div {
     border-radius: 1px;
     cursor: pointer;
     align-self: flex-end;
-    color: #fff;
     font-weight: bold;
     cursor: pointer;
     transition: transform .2s ease-out;
@@ -117,6 +116,30 @@ form div {
 }
 
 .submit-button:active {
+    background-color: cornflowerblue;
+    transform: scale(1.05);
+}
+
+.resume-button {
+    margin: 10px 30px 0 0;
+    padding: 10px;
+    width: 150px;
+    background-color: #dd7777;
+    border: none;
+    border-radius: 1px;
+    cursor: pointer;
+    align-self: flex-end;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform .2s ease-out;
+}
+
+.resume-button:hover {
+    transform: scale(1.1);
+}
+
+.resume-button:active {
     background-color: cornflowerblue;
     transform: scale(1.05);
 }

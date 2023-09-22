@@ -14,6 +14,74 @@ check_lock = threading.Lock()
 HAS_ERROR = False
 ERROR = None
 
+def checker(proxy_file,has_to_resume=False):
+    """
+    Main Runner function called when user presses `Start` button.
+    This organizes the flow of the program
+    Checks for any errors and updates the progress manager
+    """
+    global HAS_ERROR, ERROR
+    proxy_manager = None
+    spreadsheet_manager = None
+    url_manager = None
+    index_checker = None
+    try:
+        # pull proxies from text file
+        ProgressManager.update_progress("Starting App ...", True)
+        proxies = []
+        if proxy_file is not None:
+            proxies = proxy_file.read().decode("utf-8").split("\n")
+        proxy_manager = ProxyManager(proxies)
+    except Exception as exception:
+        print("Proxy File Error: ", exception)
+        ProgressManager.update_progress("Failed to load proxies: " + str(exception), False)
+        HAS_ERROR = True
+        ERROR = "Failed to load proxies: " + str(exception)
+        return
+
+    try:
+        # pull sitemaps from the spreadsheet
+        ProgressManager.update_progress("Loading Spreadsheet ...")
+        spreadsheet_manager = SpreadsheetManager(URL_TO_SHEETS)
+
+        # get all urls from the sitemaps as a manager
+        ProgressManager.update_progress("Parsing URLs (this may take a while) ...")
+        url_manager = URLManager(spreadsheet_manager)
+        url_manager.process(has_to_resume)
+    except Exception as exception:
+        print("Spreadsheet Error: ", exception)
+        ProgressManager.update_progress(
+            "Failed to load spreadsheet: " + str(exception), False
+        )
+        HAS_ERROR = True
+        ERROR = "Failed to load spreadsheet: " + str(exception)
+        return
+
+    try:
+        # run the checks
+        ProgressManager.update_progress("Checking URLs ...")
+        index_checker = Indexer(proxy_manager, url_manager, spreadsheet_manager)
+        done_status = index_checker.process()
+        if not done_status:
+            HAS_ERROR = True
+            ERROR = "Failed to run checks: failed multiple times"
+        else:
+            HAS_ERROR = False
+            ERROR = None
+
+        ProgressManager.update_progress("Checks Complete")
+        # save unindexed
+        spreadsheet_manager.save_unindexed_to_sheets("Checks Completed")
+        ProgressManager.is_working = "False"
+
+    except Exception as exception:
+        print("Checker Error: ", exception)
+        HAS_ERROR = True
+        ERROR = "Failed to run checks: " + str(exception)
+        ProgressManager.update_progress("Failed to run checks: " + str(exception), False)
+        spreadsheet_manager.save_unindexed_to_sheets("Failed to run checks: " + str(exception))
+        return
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """
@@ -25,8 +93,8 @@ def index():
     return flask.render_template("index.html", url_to_sheets=URL_TO_SHEETS)
 
 
-@app.route("/working", methods=["POST"])
-def check():
+@app.route("/run", methods=["POST"])
+def run():
     """
     The Main function that is ran to check the urls.
     This route is called by the UI when the user clicks the "Start" button
@@ -36,81 +104,10 @@ def check():
     if "proxy-file" in flask.request.files:
         proxy_file = flask.request.files["proxy-file"]
 
-    def checker(proxy_file):
-        """
-        Main Runner function called when user presses `Start` button.
-        This organizes the flow of the program
-        Checks for any errors and updates the progress manager
-        """
-        global HAS_ERROR, ERROR
-        proxy_manager = None
-        spreadsheet_manager = None
-        url_manager = None
-        index_checker = None
-        try:
-            # pull proxies from text file
-            ProgressManager.update_progress("Starting App ...", True)
-            proxies = []
-            if proxy_file is not None:
-                proxies = proxy_file.read().decode("utf-8").split("\n")
-            proxy_manager = ProxyManager(proxies)
-        except Exception as exception:
-            print("Proxy File Error: ", exception)
-            ProgressManager.update_progress("Failed to load proxies: " + str(exception), False)
-            HAS_ERROR = True
-            ERROR = "Failed to load proxies: " + str(exception)
-            return
-
-        try:
-            # pull sitemaps from the spreadsheet
-            ProgressManager.update_progress("Loading Spreadsheet ...")
-            spreadsheet_manager = SpreadsheetManager(URL_TO_SHEETS)
-
-            # get all urls from the sitemaps as a manager
-            ProgressManager.update_progress("Parsing URLs (this may take a while) ...")
-            url_manager = URLManager(spreadsheet_manager)
-            url_manager.process()
-        except Exception as exception:
-            print("Spreadsheet Error: ", exception)
-            ProgressManager.update_progress(
-                "Failed to load spreadsheet: " + str(exception), False
-            )
-            HAS_ERROR = True
-            ERROR = "Failed to load spreadsheet: " + str(exception)
-            return
-
-        try:
-            # run the checks
-            ProgressManager.update_progress("Checking URLs ...")
-            index_checker = Indexer(proxy_manager, url_manager, spreadsheet_manager)
-            done_status = index_checker.process()
-            if not done_status:
-                HAS_ERROR = True
-                ERROR = "Failed to run checks: failed multiple times"
-            else:
-                HAS_ERROR = False
-                ERROR = None
-
-            ProgressManager.update_progress("Checks Complete")
-            # save unindexed
-            spreadsheet_manager.save_unindexed_to_sheets("Checks Completed")
-            ProgressManager.is_working = "False"
-
-        except Exception as exception:
-            print("Checker Error: ", exception)
-            HAS_ERROR = True
-            ERROR = "Failed to run checks: " + str(exception)
-            ProgressManager.update_progress("Failed to run checks: " + str(exception), False)
-            spreadsheet_manager.save_unindexed_to_sheets("Failed to run checks: " + str(exception))
-            return
-
-        ProgressManager.is_working = "False"
-        time.sleep(6)
-        ProgressManager.is_working = "True"
 
     if check_lock.acquire(blocking=False):  # Attempt to acquire the lock
         try:
-            check_thread = threading.Thread(target=checker, args=(proxy_file,))
+            check_thread = threading.Thread(target=checker, args=(proxy_file, True if "Resume" in flask.request.form else False ))
             check_thread.start()
             return flask.render_template("done.html", url_to_sheets=URL_TO_SHEETS, message="The process is running, check the sheets for status")
         finally:
@@ -120,7 +117,6 @@ def check():
             "Please Wait, Another thread is already running.",
             503,
         )  # Service Unavailable
-
 
 
 @app.route("/done")

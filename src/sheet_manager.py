@@ -59,8 +59,14 @@ class SpreadsheetManager:
     def save_unindexed_to_sheets(self, status: str):
         self.update_unindexed_sheet_with(self.unindexed_urls, status)
 
+    def get_unindexed_sheet(self) -> list[str]:
+        all_data =np.array(self.unindexed_sheet.get_all_values()).flatten()
+        if(len(all_data) >1):
+            self.unindexed_urls.extend(all_data[1:])
+        return all_data
+
+
     def update_unindexed_sheet_with(self, list_of_urls: list, status: [str]):
-        
         self.unindexed_sheet.clear()  # Clear the existing content
         print("Updating unindexed sheet with:", list_of_urls)
         # Convert the list of URLs into a two-dimensional list using numpy
@@ -69,6 +75,7 @@ class SpreadsheetManager:
             return
         urls_2d = np.array(list_of_urls).reshape(-1, 1).tolist()
         self.unindexed_sheet.append_rows(urls_2d)
+        pass
 
     def get_count_sheet_as_dict(self) -> dict:
         # Read data from the sheet
