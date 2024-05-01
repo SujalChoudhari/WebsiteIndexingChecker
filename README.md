@@ -69,5 +69,3 @@ The **Website Index Checker** app checks if the URLs listed in the specified sit
 
 If you have any questions or encounter any issues while working with the app, please contact [@SujalChoudhari](https://github.com/SujalChoudhari).
 Happy indexing!
-
-*[Note: This README is for internal use only and should not be shared outside the team.]*
